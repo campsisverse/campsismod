@@ -84,6 +84,13 @@ reference:
   - InitialCondition
   - LagTime
   - get_prefix
+
+- title: "Covariate definitions"
+  contents:
+  - CategoricalCovariateDefinition
+  - DiscreteCovariateDefinition
+  - NumericCovariateDefinition
+  - CovariateDefinitions
   
 - title: "Model parameters replication"
   contents:
@@ -144,7 +151,10 @@ reference:
   contents:
   - auto_replication_settings-class
   - campsis_model-class
+  - categorical_covariate_definition-class
   - code_record-class
+  - covariate_definition-class
+  - covariate_definitions-class
   - comment-class
   - compartment-class
   - compartments-class
@@ -171,6 +181,7 @@ reference:
   - model_statement-class
   - model_statements-class
   - mrgsolve_type-class
+  - numeric_covariate_definition-class
   - pattern-class
   - pmx_element-class
   - pmx_position-class
@@ -239,4 +250,3 @@ reference:
   - map_s4_slots_to_json_properties
   - update_compartments
   - shift_omega_indexes
-

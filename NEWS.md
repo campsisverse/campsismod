@@ -3,6 +3,7 @@
 * Implement covariate definition S4 classes and CampsisModel integration #133
 * Improve show method on covariates #134
 * Migrate package to campsisverse organisation #135
+* Update pkgdown documentation #136
 
 # campsismod 1.4.2
 * Update maintainer's email address

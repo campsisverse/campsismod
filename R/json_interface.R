@@ -327,7 +327,7 @@ json_to_parameter <- function(x, index = NULL, index2 = NULL) {
 #'
 #' @param x JSON data
 #' @return Campsis covariate definition
-#' @export
+#' @keywords internal
 #'
 json_to_covariate_definition <- function(x) {
   if (x$type == "numeric") {

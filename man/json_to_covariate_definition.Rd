@@ -15,3 +15,4 @@ Campsis covariate definition
 \description{
 JSON to Campsis covariate definition.
 }
+\keyword{internal}
