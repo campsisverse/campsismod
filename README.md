@@ -3,17 +3,15 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/Calvagone/campsismod/workflows/R-CMD-check/badge.svg)](https://github.com/Calvagone/campsismod/actions)
+[![R-CMD-check](https://github.com/campsisverse/campsismod/workflows/R-CMD-check/badge.svg)](https://github.com/campsisverse/campsismod/actions)
 [![Codecov test
-coverage](https://codecov.io/gh/Calvagone/campsismod/graph/badge.svg)](https://app.codecov.io/gh/Calvagone/campsismod)
+coverage](https://codecov.io/gh/campsisverse/campsismod/graph/badge.svg)](https://app.codecov.io/gh/campsisverse/campsismod)
 [![CRAN
 version](http://www.r-pkg.org/badges/version/campsismod)](https://cran.r-project.org/package=campsismod)
 [![CRAN total
 downloads](https://cranlogs.r-pkg.org/badges/grand-total/campsismod)](https://cran.r-project.org/package=campsismod)
 [![CRAN total
 downloads](https://cranlogs.r-pkg.org/badges/campsismod)](https://cran.r-project.org/package=campsismod)
-[![campsismod status
-badge](https://calvagone.r-universe.dev/campsismod/badges/version)](https://calvagone.r-universe.dev/campsismod)
 <!-- badges: end -->
 
 ## Installation
@@ -27,7 +25,7 @@ install.packages("campsismod")
 Alternatively, the package can also be installed with `devtools`:
 
 ``` r
-devtools::install_github("Calvagone/campsismod")
+devtools::install_github("campsisverse/campsismod")
 ```
 
 ## Basic examples

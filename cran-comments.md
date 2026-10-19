@@ -9,8 +9,8 @@
 
 0 errors | 0 warnings | 0 note
 
-## Submission Summary & Maintainer Update
-This patch release updates the maintainer's email address.
+## Submission Summary
+This release updates the upstream repository URLs to reflect the migration to the new `campsisverse` organization and adds the concept of covariate definitions to the package.
 
-* Updated maintainer email to `nicolas.luyckx@lynxsoft.be`.
-* No API or functional changes have been introduced in this patch release.
+* Updated URL and BugReports links in `DESCRIPTION` to point to `https://github.com/campsisverse/campsismod`.
+* Covariate definitions in the Campsis model and JSON schema (see tickets #132, #133 and #134)
