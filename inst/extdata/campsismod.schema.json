@@ -358,7 +358,8 @@
         {
           "properties": {
             "type": {
-              "const": "numeric"
+              "const": "numeric_covariate_definition",
+              "default": "numeric_covariate_definition"
             },
             "unit": {
               "type": "string",
@@ -380,7 +381,8 @@
         {
           "properties": {
             "type": {
-              "const": "categorical"
+              "const": "categorical_covariate_definition",
+              "default": "categorical_covariate_definition"
             },
             "categories": {
               "type": "object",

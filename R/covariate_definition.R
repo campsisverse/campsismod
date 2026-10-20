@@ -163,14 +163,14 @@ setMethod("get_name", signature = c("covariate_definition"), definition = functi
 #' @rdname export_to_json
 setMethod("export_to_json", signature = c("numeric_covariate_definition"), definition = function(object, ...) {
   json <- map_s4_slots_to_json_properties(object, optional = c("label", "description", "unit"))
-  json$type <- "numeric"
+  json$type <- "numeric_covariate_definition"
   return(JSONElement(json))
 })
 
 #' @rdname export_to_json
 setMethod("export_to_json", signature = c("categorical_covariate_definition"), definition = function(object, ...) {
   json <- map_s4_slots_to_json_properties(object, optional = c("label", "description"))
-  json$type <- "categorical"
+  json$type <- "categorical_covariate_definition"
   # Convert categories vector to named list for JSON
   categories <- as.list(object@categories)
   json$categories <- categories
@@ -203,7 +203,7 @@ setMethod("load_from_json", signature = c("categorical_covariate_definition", "j
 #_______________________________________________________________________________
 
 setMethod("show", signature = c("covariate_definition"), definition = function(object) {
-  type <- ifelse(is(object, "numeric_covariate_definition"), "numeric", "categorical")
+  type <- ifelse(is(object, "numeric_covariate_definition"), "numeric_covariate_definition", "categorical_covariate_definition")
   label <- if (!is.na(object@label)) paste0(" [", object@label, "]") else ""
   cat(object@name, label, " (", type, "), default=", object@default_value, sep = "")
   if (is(object, "numeric_covariate_definition") && !is.na(object@unit)) {

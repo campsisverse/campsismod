@@ -171,7 +171,7 @@ json_to_campsis_model <- function(object, json) {
   jsonCovariates <- json$covariates
   if (!is.null(jsonCovariates)) {
     model@covariates@list <- jsonCovariates %>%
-      purrr::map(~ json_to_covariate_definition(.x))
+      purrr::map(~ load_from_json(new(.x$type), JSONElement(.x)))
   }
 
   # Update compartments
@@ -322,24 +322,6 @@ json_to_parameter <- function(x, index = NULL, index2 = NULL) {
     stop("Unknown parameter type")
   }
 }
-
-#' JSON to Campsis covariate definition.
-#'
-#' @param x JSON data
-#' @return Campsis covariate definition
-#' @keywords internal
-#'
-json_to_covariate_definition <- function(x) {
-  if (x$type == "numeric") {
-    covariate <- NumericCovariateDefinition()
-  } else if (x$type == "categorical") {
-    covariate <- CategoricalCovariateDefinition()
-  } else {
-    stop("Unknown covariate type")
-  }
-  return(load_from_json(object = covariate, JSONElement(x)))
-}
-
 
 #' Open JSON file.
 #'
