@@ -393,7 +393,6 @@ test_that("Campsismod gives identical results to the simpar package", {
 })
 
 test_that("Checking for positive definiteness works as expected", {
-
   no_of_replicates <- 250L
 
   set.seed(123)

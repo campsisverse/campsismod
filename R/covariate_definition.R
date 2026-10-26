@@ -169,28 +169,40 @@ setMethod("export_to_json", signature = c("categorical_covariate_definition"), d
 #_______________________________________________________________________________
 
 #' @rdname load_from_json
-setMethod("load_from_json", signature = c("continuous_covariate_definition", "json_element"), definition = function(object, json) {
-  object <- map_json_properties_to_s4_slots(object, json)
-  return(object)
-})
+setMethod(
+  "load_from_json",
+  signature = c("continuous_covariate_definition", "json_element"),
+  definition = function(object, json) {
+    object <- map_json_properties_to_s4_slots(object, json)
+    return(object)
+  }
+)
 
 #' @rdname load_from_json
-setMethod("load_from_json", signature = c("categorical_covariate_definition", "json_element"), definition = function(object, json) {
-  # Manually handle categories as map_json_properties_to_s4_slots unlists everything
-  data <- json@data
-  categories <- unlist(data$categories)
-  data$categories <- NULL
-  object <- map_json_properties_to_s4_slots(object, JSONElement(data))
-  object@categories <- categories
-  return(object)
-})
+setMethod(
+  "load_from_json",
+  signature = c("categorical_covariate_definition", "json_element"),
+  definition = function(object, json) {
+    # Manually handle categories as map_json_properties_to_s4_slots unlists everything
+    data <- json@data
+    categories <- unlist(data$categories)
+    data$categories <- NULL
+    object <- map_json_properties_to_s4_slots(object, JSONElement(data))
+    object@categories <- categories
+    return(object)
+  }
+)
 
 #_______________________________________________________________________________
 #----                                  show                                 ----
 #_______________________________________________________________________________
 
 setMethod("show", signature = c("covariate_definition"), definition = function(object) {
-  type <- ifelse(is(object, "continuous_covariate_definition"), "continuous_covariate_definition", "categorical_covariate_definition")
+  type <- ifelse(
+    is(object, "continuous_covariate_definition"),
+    "continuous_covariate_definition",
+    "categorical_covariate_definition"
+  )
   label <- if (!is.na(object@label)) paste0(" [", object@label, "]") else ""
   cat(object@name, label, " (", type, "), default=", object@default_value, sep = "")
   if (is(object, "continuous_covariate_definition") && !is.na(object@unit)) {
