@@ -1,8 +1,8 @@
 library(campsismod)
 
-test_that("Numeric covariate definition can be created and added to model", {
+test_that("Continuous covariate definition can be created and added to model", {
   model <- CampsisModel()
-  wt <- NumericCovariateDefinition(name = "WT", default_value = 70, label = "Weight", unit = "kg")
+  wt <- ContinuousCovariateDefinition(name = "WT", default_value = 70, label = "Weight", unit = "kg")
   model <- model %>%
     add(wt)
 
@@ -25,14 +25,9 @@ test_that("Categorical covariate definition can be created and added to model", 
   expect_equal(model %>% find(metab), metab)
 })
 
-test_that("Discrete covariate definition is an alias for categorical covariate definition", {
-  metab <- DiscreteCovariateDefinition(name = "METAB", default_value = 0, categories = c(Slow = 0, Fast = 1))
-  expect_s4_class(metab, "categorical_covariate_definition")
-})
-
 test_that("Covariate definition can be deleted from model", {
   model <- CampsisModel()
-  wt <- NumericCovariateDefinition(name = "WT", default_value = 70)
+  wt <- ContinuousCovariateDefinition(name = "WT", default_value = 70)
   model <- model %>%
     add(wt)
   expect_equal(model@covariates %>% length(), 1)
@@ -44,8 +39,8 @@ test_that("Covariate definition can be deleted from model", {
 
 test_that("Covariate definition can be replaced in model", {
   model <- CampsisModel()
-  wt1 <- NumericCovariateDefinition(name = "WT", default_value = 70)
-  wt2 <- NumericCovariateDefinition(name = "WT", default_value = 80)
+  wt1 <- ContinuousCovariateDefinition(name = "WT", default_value = 70)
+  wt2 <- ContinuousCovariateDefinition(name = "WT", default_value = 80)
 
   model <- model %>%
     add(wt1)
@@ -59,7 +54,7 @@ test_that("Covariate definition can be replaced in model", {
 test_that("Model with covariate definitions can be exported to and loaded from JSON", {
   model <- CampsisModel()
   model <- model %>% add(MainRecord(c("CL=THETA_1")))
-  wt <- NumericCovariateDefinition(name = "WT", default_value = 70, label = "Weight", unit = "kg")
+  wt <- ContinuousCovariateDefinition(name = "WT", default_value = 70, label = "Weight", unit = "kg")
   metab <- CategoricalCovariateDefinition(
     name = "METAB",
     default_value = 0,

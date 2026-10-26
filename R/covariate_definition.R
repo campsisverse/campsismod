@@ -31,16 +31,16 @@ setClass(
 )
 
 #_______________________________________________________________________________
-#----               numeric_covariate_definition class                      ----
+#----               continuous_covariate_definition class                   ----
 #_______________________________________________________________________________
 
 #'
-#' Numeric covariate definition class.
+#' Continuous covariate definition class.
 #'
 #' @slot unit covariate unit
 #' @export
 setClass(
-  "numeric_covariate_definition",
+  "continuous_covariate_definition",
   representation(
     unit = "character"
   ),
@@ -54,16 +54,16 @@ setClass(
 )
 
 #'
-#' Create a numeric covariate definition.
+#' Create a continuous covariate definition.
 #'
 #' @param name covariate name
 #' @param default_value default value
 #' @param label covariate label, optional
 #' @param unit covariate unit, optional
 #' @param description detailed description, optional
-#' @return a numeric covariate definition
+#' @return a continuous covariate definition
 #' @export
-NumericCovariateDefinition <- function(
+ContinuousCovariateDefinition <- function(
   name = NA,
   default_value = NA,
   label = NA,
@@ -71,7 +71,7 @@ NumericCovariateDefinition <- function(
   description = NA
 ) {
   return(new(
-    "numeric_covariate_definition",
+    "continuous_covariate_definition",
     name = as.character(name),
     default_value = as.numeric(default_value),
     label = as.character(label),
@@ -134,19 +134,6 @@ CategoricalCovariateDefinition <- function(
   ))
 }
 
-#'
-#' Create a discrete covariate definition.
-#' Alias for CategoricalCovariateDefinition.
-#'
-#' @param name covariate name
-#' @param default_value default value
-#' @param label covariate label, optional
-#' @param categories mapping of category labels to numeric values, optional
-#' @param description detailed description, optional
-#' @return a categorical covariate definition
-#' @export
-DiscreteCovariateDefinition <- CategoricalCovariateDefinition
-
 #_______________________________________________________________________________
 #----                              get_name                                  ----
 #_______________________________________________________________________________
@@ -161,9 +148,9 @@ setMethod("get_name", signature = c("covariate_definition"), definition = functi
 #_______________________________________________________________________________
 
 #' @rdname export_to_json
-setMethod("export_to_json", signature = c("numeric_covariate_definition"), definition = function(object, ...) {
+setMethod("export_to_json", signature = c("continuous_covariate_definition"), definition = function(object, ...) {
   json <- map_s4_slots_to_json_properties(object, optional = c("label", "description", "unit"))
-  json$type <- "numeric_covariate_definition"
+  json$type <- "continuous_covariate_definition"
   return(JSONElement(json))
 })
 
@@ -182,7 +169,7 @@ setMethod("export_to_json", signature = c("categorical_covariate_definition"), d
 #_______________________________________________________________________________
 
 #' @rdname load_from_json
-setMethod("load_from_json", signature = c("numeric_covariate_definition", "json_element"), definition = function(object, json) {
+setMethod("load_from_json", signature = c("continuous_covariate_definition", "json_element"), definition = function(object, json) {
   object <- map_json_properties_to_s4_slots(object, json)
   return(object)
 })
@@ -203,10 +190,10 @@ setMethod("load_from_json", signature = c("categorical_covariate_definition", "j
 #_______________________________________________________________________________
 
 setMethod("show", signature = c("covariate_definition"), definition = function(object) {
-  type <- ifelse(is(object, "numeric_covariate_definition"), "numeric_covariate_definition", "categorical_covariate_definition")
+  type <- ifelse(is(object, "continuous_covariate_definition"), "continuous_covariate_definition", "categorical_covariate_definition")
   label <- if (!is.na(object@label)) paste0(" [", object@label, "]") else ""
   cat(object@name, label, " (", type, "), default=", object@default_value, sep = "")
-  if (is(object, "numeric_covariate_definition") && !is.na(object@unit)) {
+  if (is(object, "continuous_covariate_definition") && !is.na(object@unit)) {
     cat(", unit=", object@unit, sep = "")
   }
   if (is(object, "categorical_covariate_definition") && length(object@categories) > 0) {

@@ -7,7 +7,7 @@
 \alias{export_to_json,omega-method}
 \alias{export_to_json,sigma-method}
 \alias{export_to_json,parameters-method}
-\alias{export_to_json,numeric_covariate_definition-method}
+\alias{export_to_json,continuous_covariate_definition-method}
 \alias{export_to_json,categorical_covariate_definition-method}
 \alias{export_to_json,covariate_definitions-method}
 \alias{export_to_json,campsis_model-method}
@@ -23,7 +23,7 @@ export_to_json(object, ...)
 
 \S4method{export_to_json}{parameters}(object, ...)
 
-\S4method{export_to_json}{numeric_covariate_definition}(object, ...)
+\S4method{export_to_json}{continuous_covariate_definition}(object, ...)
 
 \S4method{export_to_json}{categorical_covariate_definition}(object, ...)
 

@@ -88,8 +88,7 @@ reference:
 - title: "Covariate definitions"
   contents:
   - CategoricalCovariateDefinition
-  - DiscreteCovariateDefinition
-  - NumericCovariateDefinition
+  - ContinuousCovariateDefinition
   - CovariateDefinitions
   
 - title: "Model parameters replication"
@@ -181,7 +180,7 @@ reference:
   - model_statement-class
   - model_statements-class
   - mrgsolve_type-class
-  - numeric_covariate_definition-class
+  - continuous_covariate_definition-class
   - pattern-class
   - pmx_element-class
   - pmx_position-class

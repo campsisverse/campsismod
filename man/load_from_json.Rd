@@ -6,7 +6,7 @@
 \alias{load_from_json,theta,json_element-method}
 \alias{load_from_json,omega,json_element-method}
 \alias{load_from_json,sigma,json_element-method}
-\alias{load_from_json,numeric_covariate_definition,json_element-method}
+\alias{load_from_json,continuous_covariate_definition,json_element-method}
 \alias{load_from_json,categorical_covariate_definition,json_element-method}
 \alias{load_from_json,campsis_model,json_element-method}
 \alias{load_from_json,campsis_model,character-method}
@@ -20,7 +20,7 @@ load_from_json(object, json)
 
 \S4method{load_from_json}{sigma,json_element}(object, json)
 
-\S4method{load_from_json}{numeric_covariate_definition,json_element}(object, json)
+\S4method{load_from_json}{continuous_covariate_definition,json_element}(object, json)
 
 \S4method{load_from_json}{categorical_covariate_definition,json_element}(object, json)
 
