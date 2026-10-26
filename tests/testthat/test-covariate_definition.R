@@ -77,10 +77,10 @@ test_that("Model with covariate definitions can be exported to and loaded from J
 
 test_that("Continuous covariate definition show method works as expected", {
   wt <- ContinuousCovariateDefinition(name = "WT", default_value = 70, label = "Weight", unit = "kg")
-  expect_output(show(wt), "WT \\[Weight\\] \\(continuous_covariate_definition\\), default=70, unit=kg")
+  expect_output(show(wt), "WT \\[Weight\\] \\(continuous\\), default=70, unit=kg")
 
   wt2 <- ContinuousCovariateDefinition(name = "WT", default_value = 70)
-  expect_output(show(wt2), "WT \\(continuous_covariate_definition\\), default=70")
+  expect_output(show(wt2), "WT \\(continuous\\), default=70")
 })
 
 test_that("Categorical covariate definition show method works as expected", {
@@ -92,6 +92,6 @@ test_that("Categorical covariate definition show method works as expected", {
   )
   expect_output(
     show(metab),
-    "METAB \\[Metaboliser\\] \\(categorical_covariate_definition\\), default=0, categories: Slow=0, Fast=1"
+    "METAB \\[Metaboliser\\] \\(categorical\\), default=0, categories: Slow=0, Fast=1"
   )
 })

@@ -200,8 +200,8 @@ setMethod(
 setMethod("show", signature = c("covariate_definition"), definition = function(object) {
   type <- ifelse(
     is(object, "continuous_covariate_definition"),
-    "continuous_covariate_definition",
-    "categorical_covariate_definition"
+    "continuous",
+    "categorical"
   )
   label <- if (!is.na(object@label)) paste0(" [", object@label, "]") else ""
   cat(object@name, label, " (", type, "), default=", object@default_value, sep = "")
