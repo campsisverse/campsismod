@@ -95,3 +95,49 @@ test_that("Categorical covariate definition show method works as expected", {
     "METAB \\[Metaboliser\\] \\(categorical\\), default=0, categories: Slow=0, Fast=1"
   )
 })
+
+
+test_that("Warning is issued when model with covariates is written to legacy format", {
+  model <- CampsisModel() %>%
+    add(MainRecord(c("CL=THETA_1"))) %>%
+    add(ContinuousCovariateDefinition(name = "WT", default_value = 70))
+
+  tmp_dir <- file.path(tempdir(), "test_model_legacy")
+  if (dir.exists(tmp_dir)) unlink(tmp_dir, recursive = TRUE)
+
+  expect_warning(
+    model %>% write(tmp_dir),
+    "Covariates are not exported. Please use the newer JSON format \\(model %>% write\\('model.json'\\)\\) to save your covariates."
+  )
+
+  if (dir.exists(tmp_dir)) unlink(tmp_dir, recursive = TRUE)
+})
+
+test_that("No warning is issued when model with covariates is written to JSON format", {
+  model <- CampsisModel() %>%
+    add(MainRecord(c("CL=THETA_1"))) %>%
+    add(ContinuousCovariateDefinition(name = "WT", default_value = 70))
+
+  tmp_file <- file.path(tempdir(), "test_model.json")
+  if (file.exists(tmp_file)) unlink(tmp_file)
+
+  expect_silent(
+    model %>% write(tmp_file)
+  )
+
+  if (file.exists(tmp_file)) unlink(tmp_file)
+})
+
+test_that("No warning is issued when model without covariates is written to legacy format", {
+  model <- CampsisModel() %>%
+    add(MainRecord(c("CL=THETA_1")))
+
+  tmp_dir <- file.path(tempdir(), "test_model_legacy_no_cov")
+  if (dir.exists(tmp_dir)) unlink(tmp_dir, recursive = TRUE)
+
+  expect_silent(
+    model %>% write(tmp_dir)
+  )
+
+  if (dir.exists(tmp_dir)) unlink(tmp_dir, recursive = TRUE)
+})

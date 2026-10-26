@@ -628,6 +628,10 @@ setMethod("write", signature = c("campsis_model", "character"), definition = fun
   records <- object@model
   parameters <- object@parameters
 
+  if (length(object@covariates) > 0) {
+    warning("Covariates are not exported. Please use the newer JSON format (model %>% write('model.json')) to save your covariates.")
+  }
+
   if (zip) {} else {
     if (dir.exists(file)) {
       # do nothing

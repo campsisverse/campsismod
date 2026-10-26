@@ -4,6 +4,7 @@
 * Improve show method on covariates #134
 * Migrate package to campsisverse organisation #135
 * Update pkgdown documentation #136
+* Issue warning when covariates are exported to legacy directory format #137
 
 # campsismod 1.4.2
 * Update maintainer's email address
