@@ -231,7 +231,7 @@ importFrom(ggplot2,
 )
 importFrom(jsonlite,parse_json)
 importFrom(jsonvalidate,json_schema)
-importFrom(magrittr,`%>%`)
+importFrom(magrittr,"%>%")
 importFrom(methods,
   "slot<-",
   callNextMethod,

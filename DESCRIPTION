@@ -110,4 +110,4 @@ Collate:
     'mrgsolve_conversion.R'
     'json_interface.R'
     'deprecated_methods.R'
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
