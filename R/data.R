@@ -13,6 +13,6 @@
 #'    \item{literature}{a couple of models coming from the literature}
 #'    \item{other}{a couple of custom models}
 #' }
-#' @source \url{https://calvagone.github.io/campsis.doc/}
+#' @source \url{https://campsisverse.github.io/campsis.doc/}
 #' @source \url{https://www.iconplc.com/solutions/technologies/nonmem/}
 "model_suite"

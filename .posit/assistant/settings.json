@@ -1,0 +1,14 @@
+{
+  "permission": {
+    "edit": {
+      "*.json": "allow",
+      "*.R": "allow",
+      "*.yml": "allow",
+      "*/NAMESPACE": "allow",
+      "*.md": "allow"
+    },
+    "bash": {
+      "Rscript *": "allow"
+    }
+  }
+}

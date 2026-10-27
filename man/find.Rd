@@ -10,6 +10,7 @@
 \alias{find,campsis_model,compartment-method}
 \alias{find,campsis_model,compartment_property-method}
 \alias{find,campsis_model,parameter-method}
+\alias{find,campsis_model,covariate_definition-method}
 \alias{find,campsis_model,code_record-method}
 \alias{find,campsis_model,model_statement-method}
 \title{Find an element in list.}
@@ -29,6 +30,8 @@ find(object, x)
 \S4method{find}{campsis_model,compartment_property}(object, x)
 
 \S4method{find}{campsis_model,parameter}(object, x)
+
+\S4method{find}{campsis_model,covariate_definition}(object, x)
 
 \S4method{find}{campsis_model,code_record}(object, x)
 

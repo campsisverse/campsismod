@@ -167,6 +167,13 @@ json_to_campsis_model <- function(object, json) {
 
   model@parameters@list <- c(thetas, omegas, omegasOffDiag, sigmas, sigmasOffDiag)
 
+  # Parse covariate definitions
+  jsonCovariates <- json$covariates
+  if (!is.null(jsonCovariates)) {
+    model@covariates@list <- jsonCovariates %>%
+      purrr::map(~ load_from_json(new(.x$type), JSONElement(.x)))
+  }
+
   # Update compartments
   model <- model %>%
     update_compartments()
@@ -315,7 +322,6 @@ json_to_parameter <- function(x, index = NULL, index2 = NULL) {
     stop("Unknown parameter type")
   }
 }
-
 
 #' Open JSON file.
 #'

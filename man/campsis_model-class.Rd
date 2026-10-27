@@ -15,5 +15,7 @@ Campsis model class.
 \item{\code{parameters}}{model parameters}
 
 \item{\code{compartments}}{model compartments}
+
+\item{\code{covariates}}{model covariate definitions}
 }}
 

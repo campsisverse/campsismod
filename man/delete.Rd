@@ -13,6 +13,7 @@
 \alias{delete,code_records,model_statement-method}
 \alias{delete,campsis_model,compartment_property-method}
 \alias{delete,campsis_model,parameter-method}
+\alias{delete,campsis_model,covariate_definition-method}
 \alias{delete,campsis_model,code_record-method}
 \alias{delete,campsis_model,model_statement-method}
 \title{Delete an element from this list.}
@@ -38,6 +39,8 @@ delete(object, x)
 \S4method{delete}{campsis_model,compartment_property}(object, x)
 
 \S4method{delete}{campsis_model,parameter}(object, x)
+
+\S4method{delete}{campsis_model,covariate_definition}(object, x)
 
 \S4method{delete}{campsis_model,code_record}(object, x)
 

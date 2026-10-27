@@ -16,7 +16,7 @@ A list with all the models:
 }
 }
 \source{
-\url{https://calvagone.github.io/campsis.doc/}
+\url{https://campsisverse.github.io/campsis.doc/}
 
 \url{https://www.iconplc.com/solutions/technologies/nonmem/}
 }

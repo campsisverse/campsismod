@@ -4,8 +4,8 @@
 %   R/model_equation.R, R/model_ode.R, R/model_if_statement.R, R/compartment.R,
 %   R/compartment_bioavailability.R, R/compartment_lag_time.R,
 %   R/compartment_infusion_duration.R, R/compartment_infusion_rate.R,
-%   R/compartment_initial_condition.R, R/parameter.R, R/code_record.R,
-%   R/omega_block.R
+%   R/compartment_initial_condition.R, R/parameter.R, R/covariate_definition.R,
+%   R/code_record.R, R/omega_block.R
 \name{get_name}
 \alias{get_name}
 \alias{get_name,ANY-method}
@@ -24,6 +24,7 @@
 \alias{get_name,theta-method}
 \alias{get_name,omega-method}
 \alias{get_name,sigma-method}
+\alias{get_name,covariate_definition-method}
 \alias{get_name,main_record-method}
 \alias{get_name,ode_record-method}
 \alias{get_name,f_record-method}
@@ -68,6 +69,8 @@ get_name(x)
 \S4method{get_name}{omega}(x)
 
 \S4method{get_name}{sigma}(x)
+
+\S4method{get_name}{covariate_definition}(x)
 
 \S4method{get_name}{main_record}(x)
 

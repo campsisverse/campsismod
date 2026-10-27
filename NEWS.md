@@ -1,3 +1,11 @@
+# campsismod 1.5.0
+* Add covariate definitions to campsismod JSON schema #132
+* Implement covariate definition S4 classes and CampsisModel integration #133
+* Implement 'show' method on covariates #134
+* Migrate package to campsisverse organisation #135
+* Update pkgdown documentation #136
+* Issue warning when covariates are exported to legacy directory format #137
+
 # campsismod 1.4.2
 * Update maintainer's email address
 

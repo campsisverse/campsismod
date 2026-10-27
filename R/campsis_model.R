@@ -7,13 +7,21 @@
 #' @slot model a list of code records
 #' @slot parameters model parameters
 #' @slot compartments model compartments
+#' @slot covariates model covariate definitions
 #' @export
 setClass(
   "campsis_model",
   representation(
     model = "code_records",
     parameters = "parameters",
-    compartments = "compartments"
+    compartments = "compartments",
+    covariates = "covariate_definitions"
+  ),
+  prototype = prototype(
+    model = new("code_records"),
+    parameters = new("parameters"),
+    compartments = new("compartments"),
+    covariates = new("covariate_definitions")
   )
 )
 
@@ -52,6 +60,12 @@ setMethod("add", signature = c("campsis_model", "compartment_property"), definit
 #' @rdname add
 setMethod("add", signature = c("campsis_model", "parameter"), definition = function(object, x) {
   object@parameters <- object@parameters %>% add(x)
+  return(object)
+})
+
+#' @rdname add
+setMethod("add", signature = c("campsis_model", "covariate_definition"), definition = function(object, x) {
+  object@covariates <- object@covariates %>% add(x)
   return(object)
 })
 
@@ -101,6 +115,10 @@ appendModel <- function(model1, model2) {
 
   # Append compartments (and included properties)
   model1@compartments <- model1@compartments %>% add(model2@compartments)
+
+  # Append covariate definitions
+  model1@covariates <- model1@covariates %>% add(model2@covariates)
+
   return(model1)
 }
 
@@ -176,6 +194,12 @@ setMethod("delete", signature = c("campsis_model", "compartment_property"), defi
 #' @rdname delete
 setMethod("delete", signature = c("campsis_model", "parameter"), definition = function(object, x) {
   object@parameters <- object@parameters %>% delete(x)
+  return(object)
+})
+
+#' @rdname delete
+setMethod("delete", signature = c("campsis_model", "covariate_definition"), definition = function(object, x) {
+  object@covariates <- object@covariates %>% delete(x)
   return(object)
 })
 
@@ -258,6 +282,11 @@ setMethod("find", signature = c("campsis_model", "parameter"), definition = func
 })
 
 #' @rdname find
+setMethod("find", signature = c("campsis_model", "covariate_definition"), definition = function(object, x) {
+  return(object@covariates %>% find(x))
+})
+
+#' @rdname find
 setMethod("find", signature = c("campsis_model", "code_record"), definition = function(object, x) {
   return(object@model %>% find(x))
 })
@@ -285,6 +314,9 @@ setMethod("export_to_json", signature = c("campsis_model"), definition = functio
   json <- list()
   json$code <- lines
   json$parameters <- export_to_json(object@parameters)@data
+  if (length(object@covariates) > 0) {
+    json$covariates <- export_to_json(object@covariates)@data
+  }
   if (length(object@parameters@varcov) > 0) {
     json$varcov <- varcov_to_json(parameters = object@parameters)
   }
@@ -454,6 +486,12 @@ setMethod("replace", signature = c("campsis_model", "parameter"), definition = f
 })
 
 #' @rdname replace
+setMethod("replace", signature = c("campsis_model", "covariate_definition"), definition = function(object, x) {
+  object@covariates <- object@covariates %>% replace(x)
+  return(object)
+})
+
+#' @rdname replace
 setMethod("replace", signature = c("campsis_model", "code_record"), definition = function(object, x) {
   object@model <- object@model %>% replace(x)
   return(object)
@@ -539,6 +577,10 @@ setMethod("show", signature = c("campsis_model"), definition = function(object) 
   show(object@parameters)
   cat("\n")
   show(object@compartments)
+  if (length(object@covariates) > 0) {
+    cat("\n")
+    show(object@covariates)
+  }
 })
 
 #_______________________________________________________________________________
@@ -555,6 +597,9 @@ setMethod("sort", signature = c("campsis_model"), definition = function(x, decre
 
   # Sort parameters
   x@parameters <- x@parameters %>% sort()
+
+  # Sort covariate definitions
+  x@covariates <- x@covariates %>% sort()
 
   return(x)
 })
@@ -582,6 +627,10 @@ setMethod("write", signature = c("campsis_model", "character"), definition = fun
   zip <- process_extra_arg(args = list(...), name = "zip", default = FALSE)
   records <- object@model
   parameters <- object@parameters
+
+  if (length(object@covariates) > 0) {
+    warning("Covariates are not exported. Please use the newer JSON format (model %>% write('model.json')) to save your covariates.")
+  }
 
   if (zip) {} else {
     if (dir.exists(file)) {

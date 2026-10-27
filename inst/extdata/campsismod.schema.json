@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://calvagone.github.io/campsis.doc/schema/1.0/campsismod.schema.json",
-  "$comment": "Campsismod JSON Schema v1.0 © 2025 [Nicolas Luyckx / Calvagone]. Licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).",
+  "$id": "https://campsisverse.github.io/campsis.doc/schema/1.0/campsismod.schema.json",
+  "$comment": "Campsismod JSON Schema v1.0 \u00a9 2026 [Nicolas Luyckx / Calvagone]. Licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).",
   "title": "Campsismod JSON Schema",
   "$ref": "#/$defs/model",
   "$defs": {
@@ -26,6 +26,22 @@
               },
               {
                 "$ref": "#/$defs/sigma"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "type"
+            }
+          }
+        },
+        "covariates": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/continuous_covariate_definition"
+              },
+              {
+                "$ref": "#/$defs/categorical_covariate_definition"
               }
             ]
           }
@@ -86,13 +102,17 @@
         {
           "properties": {
             "type": {
-              "const": "theta"
+              "const": "theta",
+              "default": "theta"
             },
             "unit": {
               "type": "string",
               "description": "Unit of the parameter"
             }
-          }
+          },
+          "required": [
+            "type"
+          ]
         }
       ]
     },
@@ -134,10 +154,13 @@
         {
           "properties": {
             "type": {
-              "const": "omega"
+              "const": "omega",
+              "default": "omega"
             }
           },
-          "required": []
+          "required": [
+            "type"
+          ]
         }
       ]
     },
@@ -150,10 +173,13 @@
         {
           "properties": {
             "type": {
-              "const": "sigma"
+              "const": "sigma",
+              "default": "sigma"
             }
           },
-          "required": []
+          "required": [
+            "type"
+          ]
         }
       ]
     },
@@ -179,9 +205,13 @@
         {
           "properties": {
             "type": {
-              "const": "theta_ref"
+              "const": "theta_ref",
+              "default": "theta_ref"
             }
-          }
+          },
+          "required": [
+            "type"
+          ]
         }
       ]
     },
@@ -211,10 +241,13 @@
         {
           "properties": {
             "type": {
-              "const": "omega_ref"
+              "const": "omega_ref",
+              "default": "omega_ref"
             }
           },
-          "required": []
+          "required": [
+            "type"
+          ]
         }
       ]
     },
@@ -227,10 +260,13 @@
         {
           "properties": {
             "type": {
-              "const": "sigma_ref"
+              "const": "sigma_ref",
+              "default": "sigma_ref"
             }
           },
-          "required": []
+          "required": [
+            "type"
+          ]
         }
       ]
     },
@@ -253,6 +289,9 @@
               "$ref": "#/$defs/sigma_ref"
             }
           ],
+          "discriminator": {
+            "propertyName": "type"
+          },
           "description": "First referenced parameter"
         },
         "ref2": {
@@ -267,6 +306,9 @@
               "$ref": "#/$defs/sigma_ref"
             }
           ],
+          "discriminator": {
+            "propertyName": "type"
+          },
           "description": "Second referenced parameter"
         },
         "cov": {
@@ -275,9 +317,86 @@
         }
       },
       "required": [
+        "type",
         "ref1",
         "ref2",
         "cov"
+      ]
+    },
+    "covariate_definition": {
+      "title": "Base Covariate Definition",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the covariate"
+        },
+        "default_value": {
+          "type": "number",
+          "description": "Default value of the covariate"
+        },
+        "label": {
+          "type": "string",
+          "description": "Short description of the covariate"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the covariate"
+        }
+      },
+      "required": [
+        "name",
+        "default_value"
+      ]
+    },
+    "continuous_covariate_definition": {
+      "title": "Continuous Covariate Definition",
+      "allOf": [
+        {
+          "$ref": "#/$defs/covariate_definition"
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "continuous_covariate_definition",
+              "default": "continuous_covariate_definition"
+            },
+            "unit": {
+              "type": "string",
+              "description": "Unit of the covariate"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        }
+      ]
+    },
+    "categorical_covariate_definition": {
+      "title": "Categorical Covariate Definition",
+      "allOf": [
+        {
+          "$ref": "#/$defs/covariate_definition"
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "categorical_covariate_definition",
+              "default": "categorical_covariate_definition"
+            },
+            "categories": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              },
+              "description": "Mapping of category labels to numeric values"
+            }
+          },
+          "required": [
+            "type",
+            "categories"
+          ]
+        }
       ]
     }
   }

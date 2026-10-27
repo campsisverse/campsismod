@@ -14,6 +14,7 @@
 ^CRAN-SUBMISSION$
 ^codecov\.yml$
 ^\.positai$
+^\.posit$
 ^\.claude$
 ^\.vscode$
 ^air\.toml$

@@ -18,6 +18,7 @@
 \alias{add,code_records,model_statement-method}
 \alias{add,campsis_model,compartment_property-method}
 \alias{add,campsis_model,parameter-method}
+\alias{add,campsis_model,covariate_definition-method}
 \alias{add,campsis_model,code_record-method}
 \alias{add,campsis_model,model_statement-method}
 \alias{add,campsis_model,campsis_model-method}
@@ -56,6 +57,8 @@ add(object, x, ...)
 \S4method{add}{campsis_model,compartment_property}(object, x)
 
 \S4method{add}{campsis_model,parameter}(object, x)
+
+\S4method{add}{campsis_model,covariate_definition}(object, x)
 
 \S4method{add}{campsis_model,code_record}(object, x)
 

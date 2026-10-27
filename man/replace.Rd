@@ -14,6 +14,7 @@
 \alias{replace,campsis_model,compartment-method}
 \alias{replace,campsis_model,compartment_property-method}
 \alias{replace,campsis_model,parameter-method}
+\alias{replace,campsis_model,covariate_definition-method}
 \alias{replace,campsis_model,code_record-method}
 \alias{replace,campsis_model,model_statement-method}
 \title{Replace element by another in list.}
@@ -41,6 +42,8 @@ replace(object, x)
 \S4method{replace}{campsis_model,compartment_property}(object, x)
 
 \S4method{replace}{campsis_model,parameter}(object, x)
+
+\S4method{replace}{campsis_model,covariate_definition}(object, x)
 
 \S4method{replace}{campsis_model,code_record}(object, x)
 
