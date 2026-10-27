@@ -13,4 +13,4 @@
 This release updates the upstream repository URLs to reflect the migration to the new `campsisverse` organization and adds the concept of covariate definitions to the package.
 
 * Updated URL and BugReports links in `DESCRIPTION` to point to `https://github.com/campsisverse/campsismod`.
-* Covariate definitions in the Campsis model and JSON schema (see tickets #132, #133 and #134)
+* Covariate definitions in the Campsis model and JSON schema
