@@ -12,6 +12,8 @@ version](http://www.r-pkg.org/badges/version/campsismod)](https://cran.r-project
 downloads](https://cranlogs.r-pkg.org/badges/grand-total/campsismod)](https://cran.r-project.org/package=campsismod)
 [![CRAN total
 downloads](https://cranlogs.r-pkg.org/badges/campsismod)](https://cran.r-project.org/package=campsismod)
+[![campsismod status
+badge](https://campsisverse.r-universe.dev/campsismod/badges/version)](https://campsisverse.r-universe.dev/campsismod)
 <!-- badges: end -->
 
 ## Installation
