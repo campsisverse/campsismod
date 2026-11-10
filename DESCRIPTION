@@ -19,7 +19,7 @@ Description: A generic, easy-to-use and expandable implementation of a
     bioavailability and initial values). The package also provides export
     facilities for use with the simulation packages 'rxode2' and
     'mrgsolve'. The package itself is licensed under the GPL (>= 3); the
-    JSON schema file shipped in inst/extdata is licensed separately under
+    JSON schema files shipped in inst/extdata are licensed separately under
     the Creative Commons Attribution 4.0 International (CC BY 4.0).  This
     package is designed and intended to be used with the package
     'campsis', a PK/PD simulation platform built on top of 'rxode2' and
@@ -81,6 +81,7 @@ Collate:
     'model_equation.R'
     'model_ode.R'
     'model_if_statement.R'
+    'model_endpoint.R'
     'compartment.R'
     'compartment_property.R'
     'compartment_properties.R'
@@ -109,5 +110,6 @@ Collate:
     'mrgsolve_model.R'
     'mrgsolve_conversion.R'
     'json_interface.R'
+    'json_interface_v2.R'
     'deprecated_methods.R'
 Config/roxygen2/version: 8.1.1

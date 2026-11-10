@@ -9,7 +9,8 @@ open_json(json, schema = NULL)
 \arguments{
 \item{json}{JSON in its string form or path to JSON file}
 
-\item{schema}{JSON schema}
+\item{schema}{JSON schema, if NULL the schema matching the 'version' field
+of the JSON content is used}
 }
 \value{
 parsed JSON object

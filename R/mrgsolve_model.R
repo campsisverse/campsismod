@@ -23,6 +23,7 @@ setMethod(
   "export",
   signature = c("campsis_model", "mrgsolve_type"),
   definition = function(object, dest, outvars = NULL, extra_params = character(0)) {
+    object <- compile_endpoints(object)
     return(
       new(
         "mrgsolve_model",

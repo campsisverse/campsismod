@@ -27,15 +27,16 @@ setClass(
 
 #' Create a new Campsis model.
 #'
-#' @param json path to JSON Campsis model file or JSON content in string form
+#' @param json path to JSON Campsis model file or JSON content in string form.
+#'   Both the legacy format (version 1.0, no 'version' field) and the
+#'   structured format (\code{"version": "2.0"}) are supported.
 #' @return a Campsis model, empty
 #' @export
 CampsisModel <- function(json = NULL) {
   if (is.null(json)) {
     model <- new("campsis_model")
   } else {
-    schema <- system.file("extdata", "campsismod.schema.json", package = "campsismod")
-    model <- load_from_json(CampsisModel(), open_json(json = json, schema = schema))
+    model <- load_from_json(CampsisModel(), open_json(json = json))
   }
   return(model)
 }
@@ -300,9 +301,29 @@ setMethod("find", signature = c("campsis_model", "model_statement"), definition 
 #----                          export_to_json                               ----
 #_______________________________________________________________________________
 
+#' @details
+#' For Campsis models, the extra argument \code{version} selects the JSON
+#' format: \code{"1.0"} (default, legacy format with raw code) or \code{"2.0"}
+#' (structured format, compartments without the 'A_' prefix).
 #' @rdname export_to_json
-#' @importFrom utils capture.output
 setMethod("export_to_json", signature = c("campsis_model"), definition = function(object, ...) {
+  version <- process_extra_arg(args = list(...), name = "version", default = "1.0")
+  if (version == "1.0") {
+    return(campsis_model_to_json_v1(object))
+  } else if (version == "2.0") {
+    return(campsis_model_to_json_v2(object))
+  } else {
+    stop(sprintf("Unsupported Campsis JSON version '%s' (supported: 1.0, 2.0)", version))
+  }
+})
+
+#' Export a Campsis model to the legacy JSON format (version 1.0).
+#'
+#' @param object Campsis model
+#' @return a JSON element
+#' @importFrom utils capture.output
+#' @keywords internal
+campsis_model_to_json_v1 <- function(object) {
   # Delete error record if empty
   errorRecord <- object %>%
     find(ErrorRecord())
@@ -313,6 +334,12 @@ setMethod("export_to_json", signature = c("campsis_model"), definition = functio
   lines <- capture.output(show(object@model %>% add_properties_records(model = object)))
   json <- list()
   json$code <- lines
+  json <- c(json, parameters_and_covariates_to_json(object))
+  return(JSONElement(json))
+}
+
+parameters_and_covariates_to_json <- function(object) {
+  json <- list()
   json$parameters <- export_to_json(object@parameters)@data
   if (length(object@covariates) > 0) {
     json$covariates <- export_to_json(object@covariates)@data
@@ -320,8 +347,8 @@ setMethod("export_to_json", signature = c("campsis_model"), definition = functio
   if (length(object@parameters@varcov) > 0) {
     json$varcov <- varcov_to_json(parameters = object@parameters)
   }
-  return(JSONElement(json))
-})
+  return(json)
+}
 
 #_______________________________________________________________________________
 #----                         get_compartment_index                         ----
@@ -356,14 +383,20 @@ setMethod("get_var_cov", signature = c("campsis_model"), definition = function(o
 
 #' @rdname load_from_json
 setMethod("load_from_json", signature = c("campsis_model", "json_element"), definition = function(object, json) {
-  object <- json_to_campsis_model(object = object, json = json)
+  version <- get_json_version(json@data)
+  if (version == "1.0") {
+    object <- json_to_campsis_model(object = object, json = json)
+  } else if (version == "2.0") {
+    object <- json_v2_to_campsis_model(object = object, json = json)
+  } else {
+    stop(sprintf("Unsupported Campsis JSON version '%s' (supported: 1.0, 2.0)", version))
+  }
   return(object)
 })
 
 #' @rdname load_from_json
 setMethod("load_from_json", signature = c("campsis_model", "character"), definition = function(object, json) {
-  schema <- system.file("extdata", "campsismod.schema.json", package = "campsismod")
-  return(load_from_json(object = object, json = open_json(json = json, schema = schema)))
+  return(load_from_json(object = object, json = open_json(json = json)))
 })
 
 #_______________________________________________________________________________
@@ -618,10 +651,15 @@ setMethod("standardise", signature = c("campsis_model"), definition = function(o
 #----                                 write                                 ----
 #_______________________________________________________________________________
 
+#' @details
+#' When a Campsis model is written to a '.json' file, the extra argument
+#' \code{version} selects the JSON format: \code{"1.0"} (default) or
+#' \code{"2.0"}.
 #' @rdname write
 setMethod("write", signature = c("campsis_model", "character"), definition = function(object, file, ...) {
   if (endsWith(file, ".json")) {
-    return(export_to_json(object) %>% campsismod::write(file = file))
+    version <- process_extra_arg(args = list(...), name = "version", default = "1.0")
+    return(export_to_json(object, version = version) %>% campsismod::write(file = file))
   }
 
   zip <- process_extra_arg(args = list(...), name = "zip", default = FALSE)
@@ -629,7 +667,9 @@ setMethod("write", signature = c("campsis_model", "character"), definition = fun
   parameters <- object@parameters
 
   if (length(object@covariates) > 0) {
-    warning("Covariates are not exported. Please use the newer JSON format (model %>% write('model.json')) to save your covariates.")
+    warning(
+      "Covariates are not exported. Please use the newer JSON format (model %>% write('model.json')) to save your covariates."
+    )
   }
 
   if (zip) {} else {

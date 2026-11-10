@@ -1,0 +1,58 @@
+{
+  "version": "2.0",
+  "main": [
+    { "type": "comment", "text": "--- Typical parameters ---" },
+    { "lhs": "TVBIO", "rhs": "THETA_BIO" },
+    { "lhs": "TVKA", "rhs": "THETA_KA" },
+    { "lhs": "TVVC", "rhs": "THETA_VC" },
+    { "lhs": "TVCL", "rhs": "THETA_CL", "comment": "Typical clearance" },
+    { "type": "blank" },
+    { "lhs": "BIO", "rhs": "TVBIO" },
+    { "lhs": "KA", "rhs": "TVKA * exp(ETA_KA)" },
+    {
+      "type": "if",
+      "condition": "TIME > 12",
+      "then": { "lhs": "KA", "rhs": "TVKA * 1.5 * exp(ETA_KA)" },
+      "comment": "Time-dependent absorption switch"
+    },
+    { "lhs": "VC", "rhs": "TVVC * exp(ETA_VC)" },
+    { "lhs": "CL", "rhs": "TVCL * exp(ETA_CL)" }
+  ],
+  "ode": [
+    { "compartment": "ABS", "rate": "-KA * ABS", "comment": "Absorption depot" },
+    { "compartment": "CENTRAL", "rate": "KA * ABS - (CL / VC) * CENTRAL", "comment": "Central compartment" },
+    { "type": "blank" },
+    { "lhs": "CONC", "rhs": "CENTRAL / VC", "comment": "Plasma concentration" }
+  ],
+  "f": {
+    "ABS": "BIO"
+  },
+  "lag": {
+    "ABS": { "rhs": "0.5", "comment": "Absorption lag" }
+  },
+  "init": {
+    "CENTRAL": "0"
+  },
+  "endpoints": [
+    {
+      "variable": "CONC",
+      "error_model": "combined2",
+      "theta_add": "ADD_RUV",
+      "theta_prop": "PROP_RUV",
+      "sigma": "RUV",
+      "comment": "Observed concentration"
+    }
+  ],
+  "parameters": [
+    { "type": "theta", "name": "BIO", "value": 1.0, "label": "Bioavailability" },
+    { "type": "theta", "name": "KA", "value": 1.0, "label": "Absorption rate", "unit": "1/h" },
+    { "type": "theta", "name": "VC", "value": 10.0, "label": "Volume of central compartment", "unit": "L" },
+    { "type": "theta", "name": "CL", "value": 3.0, "label": "Clearance", "unit": "L/h" },
+    { "type": "theta", "name": "ADD_RUV", "value": 0.05, "label": "Additive residual error (SD)", "unit": "mg/L" },
+    { "type": "theta", "name": "PROP_RUV", "value": 0.1, "label": "Proportional residual error (SD)" },
+    { "type": "omega", "name": "KA", "value": 25.0, "var_type": "cv%" },
+    { "type": "omega", "name": "VC", "value": 25.0, "var_type": "cv%" },
+    { "type": "omega", "name": "CL", "value": 25.0, "var_type": "cv%" },
+    { "type": "sigma", "name": "RUV", "value": 1.0, "var_type": "var" }
+  ]
+}

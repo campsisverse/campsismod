@@ -1,3 +1,9 @@
+# campsismod (development version)
+* New structured JSON format (version 2.0) with its own schema `campsismod_v2.schema.json`: equations, ODEs, IF-statements, comments and blank lines are described as an abstract syntax tree, compartment names drop the legacy 'A_' prefix and compartment properties (`f`, `lag`, `duration`, `rate`, `init`) are explicit. The legacy schema is now shipped as `campsismod_v1.schema.json` and JSON files are validated against the schema matching their `version` field (1.0 when missing).
+* `CampsisModel()`, `load_from_json()` and `read.campsis()` load both legacy (1.0) and structured (2.0) JSON files into the same `campsis_model` object.
+* `Endpoint()` creates structured residual error models (additive, proportional, combined1, combined2) using nlmixr2-style standard deviation thetas and a unit-variance sigma. Endpoints are translated into plain `[ERROR]` code before export to rxode2 and mrgsolve.
+* `export_to_json()` and `write()` gain a `version` argument to export Campsis models to the structured JSON format (`version = "2.0"`); the default remains the legacy format.
+
 # campsismod 1.5.0
 * Add covariate definitions to campsismod JSON schema #132
 * Implement covariate definition S4 classes and CampsisModel integration #133

@@ -135,6 +135,31 @@ json_to_campsis_model <- function(object, json) {
     model@model <- read.model(text = text)
   }
 
+  # Parse parameters and covariates
+  model <- json_to_parameters_and_covariates(model = model, json = json)
+
+  # Update compartments
+  model <- model %>%
+    update_compartments()
+
+  # Sort model parameters
+  model <- model %>%
+    campsismod::sort()
+
+  # Parse variance-covariance matrix
+  model <- json_to_varcov(model = model, json = json)
+
+  return(model)
+}
+
+#' Load JSON parameters and covariate definitions into a Campsis model.
+#' Shared by all versions of the JSON format.
+#'
+#' @param model Campsis model
+#' @param json parsed JSON data (list)
+#' @return the updated Campsis model
+#' @keywords internal
+json_to_parameters_and_covariates <- function(model, json) {
   # Parse parameters
   jsonParameters <- json$parameters
   jsonThetas <- jsonParameters %>%
@@ -173,16 +198,17 @@ json_to_campsis_model <- function(object, json) {
     model@covariates@list <- jsonCovariates %>%
       purrr::map(~ load_from_json(new(.x$type), JSONElement(.x)))
   }
+  return(model)
+}
 
-  # Update compartments
-  model <- model %>%
-    update_compartments()
-
-  # Sort model parameters
-  model <- model %>%
-    campsismod::sort()
-
-  # Parse variance-covariance matrix
+#' Load the JSON variance-covariance matrix into a Campsis model.
+#' Shared by all versions of the JSON format.
+#'
+#' @param model Campsis model, parameters already loaded
+#' @param json parsed JSON data (list)
+#' @return the updated Campsis model
+#' @keywords internal
+json_to_varcov <- function(model, json) {
   varcov <- json$varcov
   if (length(varcov) > 0) {
     # Find all possible parameter names and initialize the matrix
@@ -323,10 +349,42 @@ json_to_parameter <- function(x, index = NULL, index2 = NULL) {
   }
 }
 
+#' Get the version of the JSON format of a Campsis model.
+#'
+#' @param json parsed JSON data (list)
+#' @return the version, '1.0' if the 'version' field is missing
+#' @keywords internal
+get_json_version <- function(json) {
+  version <- json$version
+  if (is.null(version)) {
+    return("1.0")
+  }
+  if (!is.character(version) || length(version) != 1) {
+    stop("Field 'version' must be a single character string, e.g. \"2.0\"")
+  }
+  return(version)
+}
+
+#' Get the path to the JSON schema of the given version.
+#'
+#' @param version JSON format version, '1.0' or '2.0'
+#' @return path to the JSON schema shipped with campsismod
+#' @keywords internal
+get_json_schema <- function(version) {
+  file <- switch(
+    version,
+    "1.0" = "campsismod_v1.schema.json",
+    "2.0" = "campsismod_v2.schema.json",
+    stop(sprintf("Unsupported Campsis JSON version '%s' (supported: 1.0, 2.0)", version))
+  )
+  return(system.file("extdata", file, package = "campsismod"))
+}
+
 #' Open JSON file.
 #'
 #' @param json JSON in its string form or path to JSON file
-#' @param schema JSON schema
+#' @param schema JSON schema, if NULL the schema matching the 'version' field
+#'   of the JSON content is used
 #'
 #' @return parsed JSON object
 #' @importFrom jsonlite parse_json
@@ -345,13 +403,16 @@ open_json <- function(json, schema = NULL) {
     rawJson <- suppressWarnings(paste0(readLines(json), collapse = "\n"))
   }
 
+  json_ <- jsonlite::parse_json(rawJson, simplifyVector = FALSE)
+
   # Validate content against schema
   if (get_campsismod_option(name = "VALIDATE_JSON", default = TRUE)) {
+    if (is.null(schema)) {
+      schema <- get_json_schema(get_json_version(json_))
+    }
     obj <- jsonvalidate::json_schema$new(schema)
     obj$validate(rawJson, error = TRUE)
   }
-
-  json_ <- jsonlite::parse_json(rawJson, simplifyVector = FALSE)
 
   return(JSONElement(json_))
 }

@@ -42,3 +42,8 @@ the loaded S4 object
 \description{
 Export the given object to a JSON object, ready to be written to files.
 }
+\details{
+For Campsis models, the extra argument \code{version} selects the JSON
+format: \code{"1.0"} (default, legacy format with raw code) or \code{"2.0"}
+(structured format, compartments without the 'A_' prefix).
+}

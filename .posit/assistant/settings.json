@@ -5,10 +5,20 @@
       "*.R": "allow",
       "*.yml": "allow",
       "*/NAMESPACE": "allow",
-      "*.md": "allow"
+      "*.md": "allow",
+      "*/DESCRIPTION": "allow",
+      "*.note": "allow"
     },
     "bash": {
-      "Rscript *": "allow"
+      "Rscript *": "allow",
+      "cd *": "allow",
+      "cat *": "allow",
+      "grep *": "allow",
+      "head *": "allow",
+      "sort *": "allow",
+      "uniq *": "allow",
+      "sed *": "allow",
+      "git mv *": "allow"
     }
   }
 }

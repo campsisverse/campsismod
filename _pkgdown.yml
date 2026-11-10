@@ -42,6 +42,7 @@ reference:
   contents:
   - ModelStatements
   - Comment
+  - Endpoint
   - Equation
   - IfStatement
   - LineBreak
@@ -166,6 +167,7 @@ reference:
   - compartment_property-class
   - double_array_parameter-class
   - duration_record-class
+  - endpoint-class
   - equation-class
   - error_record-class
   - export_type-class

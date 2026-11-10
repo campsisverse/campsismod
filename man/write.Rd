@@ -34,3 +34,8 @@ logical value, TRUE for success, FALSE for failure
 \description{
 Write generic object to files.
 }
+\details{
+When a Campsis model is written to a '.json' file, the extra argument
+\code{version} selects the JSON format: \code{"1.0"} (default) or
+\code{"2.0"}.
+}

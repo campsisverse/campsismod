@@ -7,7 +7,9 @@
 CampsisModel(json = NULL)
 }
 \arguments{
-\item{json}{path to JSON Campsis model file or JSON content in string form}
+\item{json}{path to JSON Campsis model file or JSON content in string form.
+Both the legacy format (version 1.0, no 'version' field) and the
+structured format (\code{"version": "2.0"}) are supported.}
 }
 \value{
 a Campsis model, empty

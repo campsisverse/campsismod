@@ -14,6 +14,7 @@ setClass(
 
 #' @rdname export
 setMethod("export", signature = c("campsis_model", "rxode_type"), definition = function(object, dest, ...) {
+  object <- compile_endpoints(object)
   return(
     new(
       "rxode_model",
