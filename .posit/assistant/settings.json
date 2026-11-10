@@ -7,7 +7,8 @@
       "*/NAMESPACE": "allow",
       "*.md": "allow",
       "*/DESCRIPTION": "allow",
-      "*.note": "allow"
+      "*.note": "allow",
+      "*.Rmd": "allow"
     },
     "bash": {
       "Rscript *": "allow",

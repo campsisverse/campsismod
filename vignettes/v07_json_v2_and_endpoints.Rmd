@@ -1,0 +1,109 @@
+---
+title: "Version 2.0 JSON Format and Structured Endpoints"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Version 2.0 JSON Format and Structured Endpoints}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+EXPORT_PNG <- FALSE
+```
+
+### Prerequisite
+
+Load the `campsismod` package:
+
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+library(campsismod)
+```
+
+### The Structured JSON Format (v2.0)
+
+Campsismod supports a structured JSON file format tagged with `"version": "2.0"`. Unlike the legacy format (version 1.0) which relies on raw text code blocks, version 2.0 uses an Abstract Syntax Tree (AST) to explicitly structure equations, ODEs, compartments, and error models.
+
+Furthermore, compartment names in v2.0 JSON files drop the legacy `A_` prefix (e.g., `ABS` instead of `A_ABS`, and `CENTRAL` instead of `A_CENTRAL`). Structural compartment attributes (`f`, `init`, `lag`, `duration`, `rate`) use these clean, un-prefixed names as keys.
+
+Here is an example of a v2.0 JSON model structure:
+
+```json
+{
+  "version": "2.0",
+  "main": [
+    { "type": "comment", "text": "--- Typical parameters ---" },
+    { "lhs": "TVCL", "rhs": "THETA_CL", "comment": "Typical clearance" },
+    { "type": "blank" },
+    { "lhs": "CL", "rhs": "TVCL * exp(ETA_CL)" }
+  ],
+  "ode": [
+    { "compartment": "ABS", "rate": "-KA * ABS", "comment": "Absorption depot" },
+    { "compartment": "CENTRAL", "rate": "KA * ABS - (CL / VC) * CENTRAL", "comment": "Central compartment" },
+    { "type": "blank" },
+    { "lhs": "CONC", "rhs": "CENTRAL / VC", "comment": "Plasma concentration" }
+  ],
+  "f": {
+    "ABS": "BIO"
+  },
+  "lag": {
+    "ABS": { "rhs": "0.5", "comment": "Absorption lag" }
+  },
+  "parameters": [
+    { "type": "theta", "name": "BIO", "value": 1.0, "label": "Bioavailability" },
+    { "type": "theta", "name": "KA", "value": 1.0, "label": "Absorption rate", "unit": "1/h" },
+    { "type": "theta", "name": "VC", "value": 10.0, "label": "Volume of central compartment", "unit": "L" },
+    { "type": "theta", "name": "CL", "value": 3.0, "label": "Clearance", "unit": "L/h" },
+    { "type": "omega", "name": "KA", "value": 25.0, "var_type": "cv%" },
+    { "type": "omega", "name": "VC", "value": 25.0, "var_type": "cv%" },
+    { "type": "omega", "name": "CL", "value": 25.0, "var_type": "cv%" }
+  ]
+}
+```
+
+### Loading and Exporting v2.0 JSON Models
+
+You can load a v2.0 JSON model using `CampsisModel()` or `read.campsis()`:
+
+```{r, eval=FALSE}
+model <- CampsisModel(json = "model_v2.json")
+```
+
+To export an existing Campsis model to the structured v2.0 format, specify `version = "2.0"` in `export_to_json()` or `write()`:
+
+```{r, eval=FALSE}
+model %>% write(file = "model_v2.json", version = "2.0")
+```
+
+### Structured Endpoints
+
+Version 2.0 supports structured residual error models (`endpoints`) aligned with `nlmixr2`. The parameterization expects `THETA` parameters holding standard deviations and a unit-variance (`variance = 1`) `SIGMA` parameter.
+
+Supported error model types:
+- `additive`: $y = f + a \epsilon$
+- `proportional`: $y = f (1 + b \epsilon)$
+- `combined1`: $y = f + (a + b f) \epsilon$
+- `combined2`: $y = f + \sqrt{a^2 + b^2 f^2} \epsilon$
+
+You can create an endpoint using the `Endpoint()` constructor:
+
+```{r}
+endpoint <- Endpoint(
+  variable = "CONC",
+  error_model = "combined2",
+  sigma = "RUV",
+  theta_add = "ADD_RUV",
+  theta_prop = "PROP_RUV",
+  comment = "Observed concentration"
+)
+endpoint
+```
+
+### Simulation Engine Compilation
+
+When exporting a model to simulation engines (`rxode2` or `mrgsolve`), structured endpoints are automatically compiled into their equivalent `[ERROR]` code block representation:
+
+```{r, eval=FALSE}
+rx_code <- model %>% export(dest = "rxode2")
+```
