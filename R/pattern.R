@@ -62,9 +62,10 @@ setMethod(
   signature = c("character", "variable_pattern", "character"),
   definition = function(object, pattern, replacement, ...) {
     return(gsub(
-      paste0("([^a-zA-Z0-9_]|^)(", pattern, ")([^a-zA-Z0-9_]|$)"),
-      replacement = paste0("\\1", replacement, "\\3"),
-      x = object
+      paste0("(?<![a-zA-Z0-9_])(", pattern, ")(?![a-zA-Z0-9_])"),
+      replacement = replacement,
+      x = object,
+      perl = TRUE
     ))
   }
 )

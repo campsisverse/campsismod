@@ -20,6 +20,9 @@ test_that("Variable pattern object works as expected", {
 
   str <- "HELLO"
   expect_equal(str %>% replace_all(pattern, ""), "HELLO")
+
+  str <- "ABS*ABS"
+  expect_equal(str %>% replace_all(VariablePattern("ABS"), "A_ABS"), "A_ABS*A_ABS")
 })
 
 test_that("Replace occurrences in model works as expected", {
