@@ -146,6 +146,11 @@ reference:
   - rxode_code
   - rxode_matrix
   - rxode_params
+
+- title: "nlmixr2 export"
+  contents:
+  - nlmixr_code
+  - nlmixr_ini
   
 - title: "Exported classes"
   contents:
@@ -182,6 +187,7 @@ reference:
   - model_statement-class
   - model_statements-class
   - mrgsolve_type-class
+  - nlmixr_type-class
   - continuous_covariate_definition-class
   - pattern-class
   - pmx_element-class

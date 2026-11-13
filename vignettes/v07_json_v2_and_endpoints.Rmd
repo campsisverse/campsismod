@@ -107,3 +107,13 @@ When exporting a model to simulation engines (`rxode2` or `mrgsolve`), structure
 ```{r, eval=FALSE}
 rx_code <- model %>% export(dest = "rxode2")
 ```
+
+### nlmixr2 Export
+
+Models can also be exported to `nlmixr2`. Compartments are named without the `A_` prefix and endpoints are mapped to the native `nlmixr2` residual error syntax: `additive` gives `CONC ~ add(THETA_ADD)`, `proportional` gives `CONC ~ prop(THETA_PROP)`, and the combined error models give `CONC ~ add(THETA_ADD) + prop(THETA_PROP) + combined1()` (or `combined2()`). The unit-variance `SIGMA` of an endpoint is not exported, since `nlmixr2` estimates the standard deviations directly.
+
+```{r, eval=FALSE}
+nlmod <- model %>% export(dest = "nlmixr2")
+fun <- eval(parse(text = nlmod %>% to_string()))
+fit <- nlmixr2::nlmixr2(fun, data, est = "saem")
+```

@@ -2,7 +2,7 @@
 % Please edit documentation in R/generic.R, R/model_unknown_statement.R,
 %   R/model_comment.R, R/model_line_break.R, R/model_equation.R, R/model_ode.R,
 %   R/model_if_statement.R, R/compartment.R, R/compartment_property.R,
-%   R/compartment_initial_condition.R, R/mrgsolve_model.R
+%   R/compartment_initial_condition.R, R/mrgsolve_model.R, R/nlmixr_model.R
 \name{to_string}
 \alias{to_string}
 \alias{to_string,unknown_statement-method}
@@ -15,6 +15,7 @@
 \alias{to_string,compartment_property-method}
 \alias{to_string,compartment_initial_condition-method}
 \alias{to_string,mrgsolve_model-method}
+\alias{to_string,nlmixr_model-method}
 \title{to_string generic method.}
 \usage{
 to_string(object, ...)
@@ -38,6 +39,8 @@ to_string(object, ...)
 \S4method{to_string}{compartment_initial_condition}(object, ...)
 
 \S4method{to_string}{mrgsolve_model}(object, ...)
+
+\S4method{to_string}{nlmixr_model}(object, ...)
 }
 \arguments{
 \item{object}{generic object}

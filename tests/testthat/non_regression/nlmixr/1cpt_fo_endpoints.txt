@@ -1,0 +1,34 @@
+function() {
+  ini({
+    THETA_BIO <- 1; label("Bioavailability")
+    THETA_KA <- 1; label("Absorption rate")
+    THETA_VC <- 10; label("Volume of central compartment")
+    THETA_CL <- 3; label("Clearance")
+    THETA_ADD_RUV <- 0.05; label("Additive residual error (SD)")
+    THETA_PROP_RUV <- 0.1; label("Proportional residual error (SD)")
+    ETA_KA ~ 0.0606246218164348
+    ETA_VC ~ 0.0606246218164348
+    ETA_CL ~ 0.0606246218164348
+  })
+  model({
+    # --- Typical parameters ---
+    TVBIO=THETA_BIO
+    TVKA=THETA_KA
+    TVVC=THETA_VC
+    TVCL=THETA_CL # Typical clearance
+
+    BIO=TVBIO
+    KA=TVKA * exp(ETA_KA)
+    if (TIME > 12) KA=TVKA * 1.5 * exp(ETA_KA) # Time-dependent absorption switch
+    VC=TVVC * exp(ETA_VC)
+    CL=TVCL * exp(ETA_CL)
+    d/dt(ABS)=-KA * ABS # Absorption depot
+    d/dt(CENTRAL)=KA * ABS - (CL / VC) * CENTRAL # Central compartment
+
+    CONC=CENTRAL / VC # Plasma concentration
+    f(ABS)=BIO
+    lag(ABS)=0.5
+    CENTRAL(0)=0
+    CONC ~ add(THETA_ADD_RUV) + prop(THETA_PROP_RUV) + combined2() # Observed concentration
+  })
+}

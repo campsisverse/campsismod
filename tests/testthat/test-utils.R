@@ -18,6 +18,19 @@ rxode_non_reg_path <- function(regFilename) {
   return(file.path(getwd(), test_path(), "non_regression", "rxode", paste0(regFilename, ".txt")))
 }
 
+nlmixr_non_reg_path <- function(regFilename) {
+  return(file.path(getwd(), test_path(), "non_regression", "nlmixr", paste0(regFilename, ".txt")))
+}
+
+nlmixr_non_reg_test <- function(nlmod, regFilename) {
+  nlmodCode <- nlmod %>% to_string()
+  if (OVERWRITE_NON_REG_FILES) {
+    to_file(nlmodCode, nlmixr_non_reg_path(regFilename))
+  }
+  expectedNlmodCode <- readLines(con = nlmixr_non_reg_path(regFilename)) %>% paste0(collapse = "\n")
+  expect_equal(nlmodCode, expectedNlmodCode)
+}
+
 campsis_non_reg_test <- function(model, regFilename) {
   if (OVERWRITE_NON_REG_FILES) {
     model %>% write(file = campsis_non_reg_path(regFilename))

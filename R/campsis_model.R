@@ -248,6 +248,15 @@ setClass(
   contains = "export_type"
 )
 
+#' nlmixr2 export type class.
+#'
+#' @export
+setClass(
+  "nlmixr_type",
+  representation(),
+  contains = "export_type"
+)
+
 #_______________________________________________________________________________
 #----                                export                                 ----
 #_______________________________________________________________________________
@@ -258,8 +267,10 @@ setMethod("export", signature = c("campsis_model", "character"), definition = fu
     return(object %>% export(new("rxode_type")))
   } else if (dest == "mrgsolve") {
     return(object %>% export(new("mrgsolve_type"), ...))
+  } else if (dest == "nlmixr2") {
+    return(object %>% export(new("nlmixr_type"), ...))
   } else {
-    stop("Only rxode2 (previously RxODE) and mrgsolve are currently supported")
+    stop("Only rxode2 (previously RxODE), mrgsolve and nlmixr2 are currently supported")
   }
 })
 

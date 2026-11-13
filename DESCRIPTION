@@ -18,8 +18,9 @@ Description: A generic, easy-to-use and expandable implementation of a
     compartment properties (such as infusion duration or rate,
     bioavailability and initial values). The package also provides export
     facilities for use with the simulation packages 'rxode2' and
-    'mrgsolve'. The package itself is licensed under the GPL (>= 3); the
-    JSON schema files shipped in inst/extdata are licensed separately under
+    'mrgsolve', and with the estimation package 'nlmixr2'. The package
+    itself is licensed under the GPL (>= 3); the JSON schema files shipped
+    in inst/extdata are licensed separately under
     the Creative Commons Attribution 4.0 International (CC BY 4.0).  This
     package is designed and intended to be used with the package
     'campsis', a PK/PD simulation platform built on top of 'rxode2' and
@@ -54,6 +55,7 @@ Suggests:
     pkgdown,
     rmarkdown,
     roxygen2,
+    rxode2,
     testthat,
     xfun
 VignetteBuilder: 
@@ -109,6 +111,8 @@ Collate:
     'rxode_conversion.R'
     'mrgsolve_model.R'
     'mrgsolve_conversion.R'
+    'nlmixr_model.R'
+    'nlmixr_conversion.R'
     'json_interface.R'
     'json_interface_v2.R'
     'deprecated_methods.R'

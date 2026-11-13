@@ -353,6 +353,49 @@ get_model_tokens <- function(model) {
   return(unique(tokens))
 }
 
+#' Get the compartment names without the legacy 'A_' prefix.
+#'
+#' Names are checked: they must be valid identifiers and must not collide with
+#' any variable of the model once the prefix is dropped.
+#'
+#' @param model Campsis model
+#' @param target name of the export target, used in error messages
+#' @param allow_unnamed if TRUE, unnamed compartments keep their prefixed name
+#'   (e.g. 'A_1'), otherwise an error is raised
+#' @return character vector of compartment names, in compartment order
+#' @keywords internal
+get_unprefixed_compartment_names <- function(model, target, allow_unnamed = FALSE) {
+  compartments <- model@compartments@list
+  cmtNames <- compartments %>% purrr::map_chr(~ .x@name)
+  unnamed <- is.na(cmtNames)
+  if (any(unnamed) && !allow_unnamed) {
+    stop(sprintf(
+      "Compartment(s) %s have no name. %s requires named compartments.",
+      paste0(compartments[unnamed] %>% purrr::map_chr(~ .x %>% to_string()), collapse = ", "),
+      target
+    ))
+  }
+  named <- cmtNames[!unnamed]
+  isIdentifier <- grepl(pattern = paste0("^", variable_pattern_str(), "$"), x = named)
+  invalid <- named[startsWith(named, "A_") | !isIdentifier]
+  if (length(invalid) > 0) {
+    stop(sprintf(
+      "Compartment name(s) %s can't be exported to %s",
+      paste0(invalid, collapse = ", "),
+      target
+    ))
+  }
+  collisions <- named[named %in% get_model_tokens(model)]
+  if (length(collisions) > 0) {
+    stop(sprintf(
+      "Variable(s) %s collide with compartment name(s) once the 'A_' prefix is dropped",
+      paste0(collisions, collapse = ", ")
+    ))
+  }
+  cmtNames[unnamed] <- compartments[unnamed] %>% purrr::map_chr(~ .x %>% to_string())
+  return(cmtNames)
+}
+
 #' Export a Campsis model to the structured JSON format (version 2.0).
 #'
 #' @param object Campsis model
@@ -360,30 +403,7 @@ get_model_tokens <- function(model) {
 #' @keywords internal
 campsis_model_to_json_v2 <- function(object) {
   # Compartment names without prefix
-  compartments <- object@compartments@list
-  cmtNames <- compartments %>% purrr::map_chr(~ .x@name)
-  if (any(is.na(cmtNames))) {
-    unnamed <- compartments[is.na(cmtNames)] %>% purrr::map_chr(~ .x %>% to_string())
-    stop(sprintf(
-      "Compartment(s) %s have no name. JSON version 2.0 requires named compartments.",
-      paste0(unnamed, collapse = ", ")
-    ))
-  }
-  isIdentifier <- grepl(pattern = paste0("^", variable_pattern_str(), "$"), x = cmtNames)
-  invalid <- cmtNames[startsWith(cmtNames, "A_") | !isIdentifier]
-  if (length(invalid) > 0) {
-    stop(sprintf(
-      "Compartment name(s) %s can't be exported to JSON version 2.0",
-      paste0(invalid, collapse = ", ")
-    ))
-  }
-  collisions <- cmtNames[cmtNames %in% get_model_tokens(object)]
-  if (length(collisions) > 0) {
-    stop(sprintf(
-      "Variable(s) %s collide with compartment name(s) once the 'A_' prefix is dropped",
-      paste0(collisions, collapse = ", ")
-    ))
-  }
+  cmtNames <- get_unprefixed_compartment_names(object, target = "JSON version 2.0")
   prefixedNames <- paste0("A_", cmtNames)
   toJson <- function(statement) {
     rename_statement_variables(statement, from = prefixedNames, to = cmtNames)
