@@ -10,7 +10,8 @@ Compartment class.
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{compartment name (without prefix)}
+\item{\code{name}}{compartment name, as used in the ODE (e.g. 'CENTRAL', or
+'A_CENTRAL' in legacy models), NA for unnamed compartments (A_<index>)}
 
 \item{\code{index}}{compartment index}
 }}

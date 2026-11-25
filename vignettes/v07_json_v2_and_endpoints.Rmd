@@ -25,7 +25,7 @@ library(campsismod)
 
 Campsismod supports a structured JSON file format tagged with `"version": "2.0"`. Unlike the legacy format (version 1.0) which relies on raw text code blocks, version 2.0 uses an Abstract Syntax Tree (AST) to explicitly structure equations, ODEs, compartments, and error models.
 
-Furthermore, compartment names in v2.0 JSON files drop the legacy `A_` prefix (e.g., `ABS` instead of `A_ABS`, and `CENTRAL` instead of `A_CENTRAL`). Structural compartment attributes (`f`, `init`, `lag`, `duration`, `rate`) use these clean, un-prefixed names as keys.
+Compartment names are used as is: the legacy `A_` prefix is no longer required, so new models can simply use `ABS` or `CENTRAL`. Legacy models keep their names (e.g., `A_ABS`, `A_CENTRAL`) when exported to version 2.0. Structural compartment attributes (`f`, `init`, `lag`, `duration`, `rate`) use the compartment names as keys. For backwards compatibility, `get_compartment_index("CENTRAL")` also finds a legacy `A_CENTRAL` compartment.
 
 Here is an example of a v2.0 JSON model structure:
 
@@ -110,7 +110,7 @@ rx_code <- model %>% export(dest = "rxode2")
 
 ### nlmixr2 Export
 
-Models can also be exported to `nlmixr2`. Compartments are named without the `A_` prefix and endpoints are mapped to the native `nlmixr2` residual error syntax: `additive` gives `CONC ~ add(THETA_ADD)`, `proportional` gives `CONC ~ prop(THETA_PROP)`, and the combined error models give `CONC ~ add(THETA_ADD) + prop(THETA_PROP) + combined1()` (or `combined2()`). The unit-variance `SIGMA` of an endpoint is not exported, since `nlmixr2` estimates the standard deviations directly.
+Models can also be exported to `nlmixr2`. Compartment names are kept as is and endpoints are mapped to the native `nlmixr2` residual error syntax: `additive` gives `CONC ~ add(THETA_ADD)`, `proportional` gives `CONC ~ prop(THETA_PROP)`, and the combined error models give `CONC ~ add(THETA_ADD) + prop(THETA_PROP) + combined1()` (or `combined2()`). The unit-variance `SIGMA` of an endpoint is not exported, since `nlmixr2` estimates the standard deviations directly.
 
 ```{r, eval=FALSE}
 nlmod <- model %>% export(dest = "nlmixr2")

@@ -26,7 +26,9 @@ mrgsolve_compartment <- function(model) {
   compartments <- model@compartments
   retValue <- "[CMT] @annotated"
   for (compartment in compartments@list) {
-    retValue <- retValue %>% append(paste0(compartment %>% to_string(), " : ", compartment@name))
+    # Annotation kept without the legacy 'A_' prefix
+    annotation <- sub(pattern = "^A_", replacement = "", x = compartment@name)
+    retValue <- retValue %>% append(paste0(compartment %>% to_string(), " : ", annotation))
   }
   return(retValue)
 }

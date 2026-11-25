@@ -164,7 +164,7 @@ setMethod(
       compartment <- retValue@list[[index]]
       oldName <- compartment %>% to_string()
       replacementName <- paste0(oldName, separator, suffix)
-      compartment@name <- gsub(pattern = "^A_", replacement = "", x = replacementName)
+      compartment@name <- replacementName
       retValue <- retValue %>%
         replace(compartment) # Replacement done by index for compartments
       if (!is.null(model)) {

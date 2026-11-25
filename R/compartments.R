@@ -95,11 +95,16 @@ setMethod("find", signature = c("compartments", "compartment_property"), definit
 
 #' @rdname get_compartment_index
 setMethod("get_compartment_index", signature = c("compartments", "character"), definition = function(object, name) {
-  compartment <- object@list %>% purrr::detect(~ .x@name == name)
-  if (compartment %>% length() == 0) {
+  cmtNames <- object@list %>% purrr::map_chr(~ .x %>% to_string())
+  position <- match(name, cmtNames)
+  # Backwards compatibility: legacy compartments (e.g. 'A_CENTRAL') may be referred to without prefix
+  if (is.na(position)) {
+    position <- match(paste0("A_", name), cmtNames)
+  }
+  if (is.na(position)) {
     stop(paste0("Compartment ", name, " not found."))
   }
-  return(compartment@index)
+  return(object@list[[position]]@index)
 })
 
 #_______________________________________________________________________________

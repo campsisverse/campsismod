@@ -2,8 +2,7 @@
 % Please edit documentation in R/json_interface_v2.R
 \name{statement_to_json_v2_node}
 \alias{statement_to_json_v2_node}
-\title{Convert a model statement into a JSON (v2.0) AST node.
-Compartment names are expected to be already stripped of their prefix.}
+\title{Convert a model statement into a JSON (v2.0) AST node.}
 \usage{
 statement_to_json_v2_node(statement)
 }
@@ -15,6 +14,5 @@ JSON node (list)
 }
 \description{
 Convert a model statement into a JSON (v2.0) AST node.
-Compartment names are expected to be already stripped of their prefix.
 }
 \keyword{internal}

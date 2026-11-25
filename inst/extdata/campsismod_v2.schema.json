@@ -147,10 +147,7 @@
     "compartment_name": {
       "type": "string",
       "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
-      "not": {
-        "pattern": "^A_"
-      },
-      "description": "Compartment name, without the legacy 'A_' prefix"
+      "description": "Compartment name, as used in the ODE (e.g. 'CENTRAL', or 'A_CENTRAL' in legacy models)"
     },
     "assignment": {
       "title": "Assignment",

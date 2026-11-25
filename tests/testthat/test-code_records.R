@@ -51,8 +51,11 @@ test_that("Sort methods", {
 test_that("Create very basic model on the fly", {
   model <- CampsisModel()
 
-  # ODE must starts with 'A_'
-  expect_error(model %>% add(Ode("CENTRAL", "-K*CENTRAL")), regexp = "Derivative name must start with 'A_'")
+  # ODE name is not required to start with 'A_'
+  expect_equal(
+    (model %>% add(Ode("CENTRAL", "-K*CENTRAL")))@compartments@list[[1]] %>% to_string(),
+    "CENTRAL"
+  )
 
   # Create minimalist model
   model <- model %>% add(Ode("A_CENTRAL", "-K*A_CENTRAL"))

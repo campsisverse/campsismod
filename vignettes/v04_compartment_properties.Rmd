@@ -122,5 +122,5 @@ model %>% replace(InfusionRate(1, "200")) # Previous value of 100 is overridden
 Interestingly, the name of a compartment can be replaced as follows:
 
 ```{r}
-model %>% replace(Compartment(1, name = "CENT")) %>% delete(Ode("A_CENTRAL")) %>% add(Ode("A_CENT", "-K*A_CENT"))
+model %>% replace(Compartment(1, name = "A_CENT")) %>% delete(Ode("A_CENTRAL")) %>% add(Ode("A_CENT", "-K*A_CENT"))
 ```

@@ -9,7 +9,8 @@ Compartment(index, name = NA)
 \arguments{
 \item{index}{compartment index}
 
-\item{name}{compartment name (without prefix)}
+\item{name}{compartment name, as used in the ODE (e.g. 'CENTRAL', or
+'A_CENTRAL' in legacy models), NA for unnamed compartments (A_<index>)}
 }
 \value{
 an empty list of compartments

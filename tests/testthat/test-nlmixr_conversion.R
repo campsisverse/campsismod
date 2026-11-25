@@ -119,7 +119,8 @@ test_that("OMEGA blocks, fixed parameters and legacy SIGMAs are exported", {
       "ETA_Q ~ 0.025"
     )
   )
-  expect_true("d/dt(DEPOT)=-KA*DEPOT" %in% nlmod@model)
+  # Compartment names are kept as is
+  expect_true("d/dt(A_DEPOT)=-KA*A_DEPOT" %in% nlmod@model)
   expect_true("OBS_CP=CP*(0 + 1)" %in% nlmod@model)
 })
 

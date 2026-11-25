@@ -13,66 +13,6 @@ get_json_v2_property_classes <- function() {
   ))
 }
 
-#' Rename variables in expressions.
-#'
-#' Whole-word replacement: a variable is only replaced when it is not
-#' preceded or followed by a letter, a digit or an underscore.
-#'
-#' @param x character vector (expressions)
-#' @param from variable names to replace
-#' @param to replacement names, same length as \code{from}
-#' @return the updated character vector
-#' @keywords internal
-rename_variables <- function(x, from, to) {
-  if (length(x) == 0 || all(is.na(x))) {
-    return(x)
-  }
-  for (i in seq_along(from)) {
-    x <- gsub(
-      pattern = sprintf("(?<![A-Za-z0-9_])%s(?![A-Za-z0-9_])", from[i]),
-      replacement = to[i],
-      x = x,
-      perl = TRUE
-    )
-  }
-  return(x)
-}
-
-#' Rename variables in a model statement (left-hand side, right-hand side,
-#' conditions). Comments are left untouched. Slots are modified directly,
-#' validity is not checked.
-#'
-#' @param statement model statement
-#' @param from variable names to replace
-#' @param to replacement names
-#' @return the updated model statement
-#' @keywords internal
-rename_statement_variables <- function(statement, from, to) {
-  if (length(from) == 0) {
-    return(statement)
-  }
-  if (is(statement, "endpoint")) {
-    statement@variable <- rename_variables(statement@variable, from, to)
-    statement@lhs <- rename_variables(statement@lhs, from, to)
-    statement@rhs <- endpoint_rhs(
-      variable = statement@variable,
-      error_model = statement@error_model,
-      theta_add = statement@theta_add,
-      theta_prop = statement@theta_prop,
-      sigma = statement@sigma
-    )
-  } else if (is(statement, "equation")) {
-    statement@lhs <- rename_variables(statement@lhs, from, to)
-    statement@rhs <- rename_variables(statement@rhs, from, to)
-  } else if (is(statement, "if_statement")) {
-    statement@condition <- rename_variables(statement@condition, from, to)
-    statement@equation <- rename_statement_variables(statement@equation, from, to)
-  } else if (is(statement, "unknown_statement")) {
-    statement@line <- rename_variables(statement@line, from, to)
-  }
-  return(statement)
-}
-
 #_______________________________________________________________________________
 #----                          JSON -> Campsis model                        ----
 #_______________________________________________________________________________
@@ -106,7 +46,7 @@ json_v2_node_to_statement <- function(node) {
     ))
   }
   if (!is.null(node$compartment)) {
-    return(Ode(paste0("A_", node$compartment), node$rate, comment = comment))
+    return(Ode(node$compartment, node$rate, comment = comment))
   }
   if (!is.null(node$lhs)) {
     return(Equation(node$lhs, node$rhs, comment = comment))
@@ -183,23 +123,6 @@ json_v2_to_campsis_model <- function(object, json) {
     stop("Fields 'endpoints' and 'error' are mutually exclusive")
   }
 
-  # Compartment names (in order of appearance in the ODE block)
-  cmtNames <- json$ode %>%
-    purrr::keep(~ !is.null(.x$compartment)) %>%
-    purrr::map_chr(~ .x$compartment) %>%
-    unique()
-  legacyNames <- cmtNames[startsWith(cmtNames, "A_")]
-  if (length(legacyNames) > 0) {
-    stop(sprintf(
-      "Compartment names must not use the legacy 'A_' prefix in version 2.0: %s",
-      paste0(legacyNames, collapse = ", ")
-    ))
-  }
-  prefixedNames <- paste0("A_", cmtNames)
-  toModel <- function(statement) {
-    rename_statement_variables(statement, from = cmtNames, to = prefixedNames)
-  }
-
   # Code records
   records <- CodeRecords()
   if (!is.null(json$main)) {
@@ -218,15 +141,11 @@ json_v2_to_campsis_model <- function(object, json) {
     record <- new("error_record", statements = parse_statements(as.character(unlist(json$error))))
     records@list <- c(records@list, record)
   }
-  records@list <- records@list %>%
-    purrr::map(function(record) {
-      record@statements@list <- record@statements@list %>% purrr::map(toModel)
-      return(record)
-    })
   model@model <- records
 
   # Compartments and their properties
   compartments <- records %>% get_compartments()
+  cmtNames <- compartments@list %>% purrr::map_chr(~ .x %>% to_string())
   propertyClasses <- get_json_v2_property_classes()
   for (key in names(propertyClasses)) {
     for (cmtName in names(json[[key]])) {
@@ -245,7 +164,7 @@ json_v2_to_campsis_model <- function(object, json) {
       property <- new(
         propertyClasses[[key]],
         compartment = as.integer(index),
-        rhs = rename_variables(rhs, from = cmtNames, to = prefixedNames),
+        rhs = rhs,
         comment = comment
       )
       compartments <- compartments %>% add(property)
@@ -276,7 +195,6 @@ add_json_v2_comment <- function(node, statement) {
 }
 
 #' Convert a model statement into a JSON (v2.0) AST node.
-#' Compartment names are expected to be already stripped of their prefix.
 #'
 #' @param statement model statement
 #' @return JSON node (list)
@@ -324,91 +242,13 @@ endpoint_to_json_v2_node <- function(endpoint) {
   return(add_json_v2_comment(node, endpoint))
 }
 
-get_statement_expressions <- function(statement) {
-  if (is(statement, "endpoint")) {
-    return(c(statement@variable, statement@lhs, statement@rhs))
-  } else if (is(statement, "equation")) {
-    return(c(statement@lhs, statement@rhs))
-  } else if (is(statement, "if_statement")) {
-    return(c(statement@condition, get_statement_expressions(statement@equation)))
-  } else if (is(statement, "unknown_statement")) {
-    return(statement@line)
-  }
-  return(character(0))
-}
-
-#' Get all variable-like tokens used in the model code and in the
-#' compartment properties.
-#'
-#' @param model Campsis model
-#' @return character vector of unique tokens
-#' @keywords internal
-get_model_tokens <- function(model) {
-  expressions <- model@model@list %>%
-    purrr::map(~ .x@statements@list %>% purrr::map(get_statement_expressions)) %>%
-    unlist()
-  expressions <- c(expressions, model@compartments@properties@list %>% purrr::map_chr(~ .x@rhs))
-  tokens <- regmatches(expressions, gregexpr("[A-Za-z_][A-Za-z0-9_]*", expressions)) %>%
-    unlist()
-  return(unique(tokens))
-}
-
-#' Get the compartment names without the legacy 'A_' prefix.
-#'
-#' Names are checked: they must be valid identifiers and must not collide with
-#' any variable of the model once the prefix is dropped.
-#'
-#' @param model Campsis model
-#' @param target name of the export target, used in error messages
-#' @param allow_unnamed if TRUE, unnamed compartments keep their prefixed name
-#'   (e.g. 'A_1'), otherwise an error is raised
-#' @return character vector of compartment names, in compartment order
-#' @keywords internal
-get_unprefixed_compartment_names <- function(model, target, allow_unnamed = FALSE) {
-  compartments <- model@compartments@list
-  cmtNames <- compartments %>% purrr::map_chr(~ .x@name)
-  unnamed <- is.na(cmtNames)
-  if (any(unnamed) && !allow_unnamed) {
-    stop(sprintf(
-      "Compartment(s) %s have no name. %s requires named compartments.",
-      paste0(compartments[unnamed] %>% purrr::map_chr(~ .x %>% to_string()), collapse = ", "),
-      target
-    ))
-  }
-  named <- cmtNames[!unnamed]
-  isIdentifier <- grepl(pattern = paste0("^", variable_pattern_str(), "$"), x = named)
-  invalid <- named[startsWith(named, "A_") | !isIdentifier]
-  if (length(invalid) > 0) {
-    stop(sprintf(
-      "Compartment name(s) %s can't be exported to %s",
-      paste0(invalid, collapse = ", "),
-      target
-    ))
-  }
-  collisions <- named[named %in% get_model_tokens(model)]
-  if (length(collisions) > 0) {
-    stop(sprintf(
-      "Variable(s) %s collide with compartment name(s) once the 'A_' prefix is dropped",
-      paste0(collisions, collapse = ", ")
-    ))
-  }
-  cmtNames[unnamed] <- compartments[unnamed] %>% purrr::map_chr(~ .x %>% to_string())
-  return(cmtNames)
-}
-
 #' Export a Campsis model to the structured JSON format (version 2.0).
+#' Compartment names are exported as is.
 #'
 #' @param object Campsis model
 #' @return a JSON element
 #' @keywords internal
 campsis_model_to_json_v2 <- function(object) {
-  # Compartment names without prefix
-  cmtNames <- get_unprefixed_compartment_names(object, target = "JSON version 2.0")
-  prefixedNames <- paste0("A_", cmtNames)
-  toJson <- function(statement) {
-    rename_statement_variables(statement, from = prefixedNames, to = cmtNames)
-  }
-
   json <- list(version = "2.0")
 
   # Main and ODE blocks
@@ -418,7 +258,7 @@ campsis_model_to_json_v2 <- function(object) {
       next
     }
     json[[tolower(recordName)]] <- record@statements@list %>%
-      purrr::map(~ statement_to_json_v2_node(toJson(.x)))
+      purrr::map(statement_to_json_v2_node)
   }
 
   # Compartment properties
@@ -431,20 +271,20 @@ campsis_model_to_json_v2 <- function(object) {
     }
     values <- properties %>%
       purrr::map(function(property) {
-        rhs <- rename_variables(property@rhs, from = prefixedNames, to = cmtNames)
         if (is.na(property@comment)) {
-          return(rhs)
+          return(property@rhs)
         }
-        return(list(rhs = rhs, comment = property@comment))
+        return(list(rhs = property@rhs, comment = property@comment))
       })
-    names(values) <- properties %>% purrr::map_chr(~ cmtNames[.x@compartment])
+    names(values) <- properties %>%
+      purrr::map_chr(~ object@compartments %>% find(Compartment(index = .x@compartment)) %>% to_string())
     json[[key]] <- values
   }
 
   # Endpoints or raw error block
   errorRecord <- object@model %>% get_by_name("ERROR")
   if (length(errorRecord) > 0) {
-    statements <- errorRecord@statements@list %>% purrr::map(toJson)
+    statements <- errorRecord@statements@list
     isEndpoint <- statements %>% purrr::map_lgl(~ is(.x, "endpoint"))
     isLineBreak <- statements %>% purrr::map_lgl(~ is(.x, "line_break"))
     if (any(isEndpoint) && all(isEndpoint | isLineBreak)) {

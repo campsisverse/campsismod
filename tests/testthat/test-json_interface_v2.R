@@ -66,10 +66,10 @@ test_that("Version 2.0 schema rejects invalid content", {
   json$error <- list("CONC_ERR=CONC")
   expect_error(CampsisModel(json = to_json(json)), regexp = "#/not", fixed = TRUE)
 
-  # Legacy 'A_' prefix not allowed on compartment names
+  # Compartment names must be identifiers
   json <- base
-  json$ode[[1]]$compartment <- "A_ABS"
-  expect_error(CampsisModel(json = to_json(json)), regexp = "compartment_name/not", fixed = TRUE)
+  json$ode[[1]]$compartment <- "1ABS"
+  expect_error(CampsisModel(json = to_json(json)), regexp = "compartment_name/pattern", fixed = TRUE)
 
   # Additive endpoint can't have a proportional theta
   json <- base
@@ -78,9 +78,6 @@ test_that("Version 2.0 schema rejects invalid content", {
 
   # Same checks happen in R when schema validation is disabled
   json <- base
-  json$ode[[1]]$compartment <- "A_ABS"
-  expect_error(CampsisModel(json = json), regexp = "legacy 'A_' prefix")
-  json <- base
   json$error <- list("CONC_ERR=CONC")
   expect_error(CampsisModel(json = json), regexp = "mutually exclusive")
   json <- base
@@ -88,7 +85,7 @@ test_that("Version 2.0 schema rejects invalid content", {
   expect_error(CampsisModel(json = json), regexp = "Compartment undefined: 'DEPOT' in 'f'")
 })
 
-test_that("Version 2.0 JSON with raw error block is loaded into the same S4 model", {
+test_that("Version 2.0 JSON with raw error block and legacy compartment names is loaded into the same S4 model", {
   model <- CampsisModel(json = json_example("1cpt_fo_model_v2.json"))
   expect_s4_class(model, "campsis_model")
   expect_equal(model, model_suite$pk$`1cpt_fo`)
@@ -99,13 +96,14 @@ test_that("Version 2.0 JSON with endpoints is translated into a Campsis model", 
   model <- endpoints_model()
   expect_s4_class(model, "campsis_model")
 
-  # Compartments get the 'A_' prefix in the S4 model
-  expect_equal(model@compartments@list %>% purrr::map_chr(~ .x %>% to_string()), c("A_ABS", "A_CENTRAL"))
+  # Compartment names are kept as is
+  expect_equal(model@compartments@list %>% purrr::map_chr(~ .x %>% to_string()), c("ABS", "CENTRAL"))
+  expect_equal(model %>% get_compartment_index("CENTRAL"), 2)
   expect_equal(
-    model %>% find(Ode("A_CENTRAL")),
-    Ode("A_CENTRAL", "KA * A_ABS - (CL / VC) * A_CENTRAL", comment = "Central compartment")
+    model %>% find(Ode("CENTRAL")),
+    Ode("CENTRAL", "KA * ABS - (CL / VC) * CENTRAL", comment = "Central compartment")
   )
-  expect_equal(model %>% find(Equation("CONC")), Equation("CONC", "A_CENTRAL / VC", comment = "Plasma concentration"))
+  expect_equal(model %>% find(Equation("CONC")), Equation("CONC", "CENTRAL / VC", comment = "Plasma concentration"))
 
   # Comments, blank lines and IF-statements
   main <- model %>% find(MainRecord())
@@ -164,13 +162,14 @@ test_that("Version 2.0 models round-trip through JSON", {
     original[c("version", "main", "ode", "f", "lag", "init", "endpoints")]
   )
 
-  # Legacy models
+  # Legacy models (including unnamed compartments)
   for (model in list(
     model_suite$pk$`1cpt_fo_transit`,
     model_suite$pk$`2cpt_fo_lag_mixed`,
     model_suite$testing$other$`2cpt_zo_allo_metab_effect_on_cl`,
     model_suite$testing$nonmem$advan4_trans4,
-    model_suite$tmdd$`2cpt_fo_tmdd_full`
+    model_suite$tmdd$`2cpt_fo_tmdd_full`,
+    model_suite$literature$filgrastim_pkpd_krzyzanski
   )) {
     expect_equal(roundtrip_v2(model), model)
   }
@@ -185,9 +184,12 @@ test_that("Version 2.0 models round-trip through JSON", {
   expect_equal(roundtrip_v2(model), model)
 })
 
-test_that("Legacy error block in version 2.0 uses compartment names without prefix", {
+test_that("Legacy models keep their compartment names in version 2.0", {
   json <- model_suite$pk$`1cpt_fo` %>% export_to_json(version = "2.0")
-  expect_equal(unlist(json@data$error)[1], "CONC=CENTRAL/VC")
+  expect_equal(json@data$ode[[1]]$compartment, "A_ABS")
+  expect_equal(json@data$ode[[2]]$rate, "KA*A_ABS - CL/VC*A_CENTRAL")
+  expect_equal(names(json@data$f), "A_ABS")
+  expect_equal(unlist(json@data$error)[1], "CONC=A_CENTRAL/VC")
   expect_null(json@data$endpoints)
 
   # A single error line is still exported as an array
@@ -258,14 +260,6 @@ test_that("Endpoint parameter references are checked when loading", {
 })
 
 test_that("Export to version 2.0 refuses models that can't be represented", {
-  # Unnamed compartments
-  model <- model_suite$literature$filgrastim_pkpd_krzyzanski
-  expect_error(model %>% export_to_json(version = "2.0"), regexp = "have no name")
-
-  # Variable name colliding with a compartment once the prefix is dropped
-  model <- model_suite$pk$`1cpt_fo` %>% add(Equation("CENTRAL", "A_CENTRAL"))
-  expect_error(model %>% export_to_json(version = "2.0"), regexp = "CENTRAL collide")
-
   # Unknown statements
   model <- model_suite$pk$`1cpt_fo` %>% add(UnknownStatement("hello"))
   expect_error(model %>% export_to_json(version = "2.0"), regexp = "Unknown statement 'hello'")

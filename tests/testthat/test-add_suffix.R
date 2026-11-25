@@ -57,16 +57,16 @@ test_that("Add suffix to a code record is working as expected", {
 test_that("Add suffix to compartments is working as expected", {
   compartments <- Compartments() %>%
     add(Compartment(index = 1, name = "ABS")) %>%
-    add(Compartment(index = 2, name = "CENTRAL")) %>%
-    add(Compartment(index = 3, name = "OUTPUT"))
+    add(Compartment(index = 2, name = "A_CENTRAL")) %>%
+    add(Compartment(index = 3))
 
   updatedCompartments <- compartments %>%
     add_suffix("A")
 
   expectedCompartments <- Compartments() %>%
     add(Compartment(index = 1, name = "ABS_A")) %>%
-    add(Compartment(index = 2, name = "CENTRAL_A")) %>%
-    add(Compartment(index = 3, name = "OUTPUT_A"))
+    add(Compartment(index = 2, name = "A_CENTRAL_A")) %>%
+    add(Compartment(index = 3, name = "A_3_A"))
 
   expect_equal(updatedCompartments, expectedCompartments)
 })

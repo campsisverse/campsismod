@@ -49,7 +49,7 @@ equation
 
 Similarly, Ordinary differential equations (ODE's) are described by 3 fields as well:
 
-- lhs: the left-hand side string, which corresponds to the variable name, must start with 'A_'
+- lhs: the left-hand side string, which corresponds to the compartment name (by convention, legacy models use the 'A_' prefix)
 - rhs: the right-hand side string, which corresponds to the derivative formula
 - comment: a possible comment
 

@@ -2,7 +2,8 @@
 % Please edit documentation in R/json_interface_v2.R
 \name{campsis_model_to_json_v2}
 \alias{campsis_model_to_json_v2}
-\title{Export a Campsis model to the structured JSON format (version 2.0).}
+\title{Export a Campsis model to the structured JSON format (version 2.0).
+Compartment names are exported as is.}
 \usage{
 campsis_model_to_json_v2(object)
 }
@@ -14,5 +15,6 @@ a JSON element
 }
 \description{
 Export a Campsis model to the structured JSON format (version 2.0).
+Compartment names are exported as is.
 }
 \keyword{internal}

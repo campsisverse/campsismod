@@ -12,14 +12,14 @@
     { "lhs": "CL", "rhs": "TVCL * exp(ETA_CL)" }
   ],
   "ode": [
-    { "compartment": "ABS", "rate": "-KA*ABS" },
-    { "compartment": "CENTRAL", "rate": "KA*ABS - CL/VC*CENTRAL" }
+    { "compartment": "A_ABS", "rate": "-KA*A_ABS" },
+    { "compartment": "A_CENTRAL", "rate": "KA*A_ABS - CL/VC*A_CENTRAL" }
   ],
   "f": {
-    "ABS": "BIO"
+    "A_ABS": "BIO"
   },
   "error": [
-    "CONC=CENTRAL/VC",
+    "CONC=A_CENTRAL/VC",
     "if (CONC <= 0.001) CONC=0.001",
     "CONC_ERR=CONC*(1 + EPS_PROP_RUV)"
   ],

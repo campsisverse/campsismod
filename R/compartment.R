@@ -5,7 +5,8 @@
 #'
 #' Compartment class.
 #'
-#' @slot name compartment name (without prefix)
+#' @slot name compartment name, as used in the ODE (e.g. 'CENTRAL', or
+#'   'A_CENTRAL' in legacy models), NA for unnamed compartments (A_<index>)
 #' @slot index compartment index
 #' @export
 setClass(
@@ -25,7 +26,8 @@ setClass(
 #' Create a compartment.
 #'
 #' @param index compartment index
-#' @param name compartment name (without prefix)
+#' @param name compartment name, as used in the ODE (e.g. 'CENTRAL', or
+#'   'A_CENTRAL' in legacy models), NA for unnamed compartments (A_<index>)
 #' @return an empty list of compartments
 #' @export
 Compartment <- function(index, name = NA) {
@@ -58,6 +60,6 @@ setMethod("to_string", signature = c("compartment"), definition = function(objec
   if (is.na(object@name)) {
     return(paste0("A", "_", object@index))
   } else {
-    return(paste0("A", "_", object@name))
+    return(object@name)
   }
 })

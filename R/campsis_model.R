@@ -315,7 +315,7 @@ setMethod("find", signature = c("campsis_model", "model_statement"), definition 
 #' @details
 #' For Campsis models, the extra argument \code{version} selects the JSON
 #' format: \code{"1.0"} (default, legacy format with raw code) or \code{"2.0"}
-#' (structured format, compartments without the 'A_' prefix).
+#' (structured format).
 #' @rdname export_to_json
 setMethod("export_to_json", signature = c("campsis_model"), definition = function(object, ...) {
   version <- process_extra_arg(args = list(...), name = "version", default = "1.0")

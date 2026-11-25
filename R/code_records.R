@@ -206,23 +206,18 @@ add_ode_compartment <- function(compartments, ode) {
   }
   name <- ode@lhs
 
-  cmtIndex <- compartments %>% length() + 1
-  if (startsWith(name, prefix = "A_")) {
-    name <- gsub("^A_", "", name)
-    if (name == as.character(cmtIndex)) {
-      name <- NA
-    }
-  } else {
-    stop(paste0("Compartment ", name, " does not start with 'A_'"))
-  }
-  compartment <- Compartment(index = cmtIndex, name = name)
-  names <- compartments@list %>% purrr::map_chr(~ .x@name) %>% purrr::discard(is.na)
-
   # Add compartment only if not there yet
-  if (is.na(name) || !(name %in% names)) {
-    compartments <- compartments %>% add(compartment)
+  existingNames <- compartments@list %>% purrr::map_chr(~ .x %>% to_string())
+  if (name %in% existingNames) {
+    return(compartments)
   }
-  return(compartments)
+
+  # Legacy unnamed compartments are written A_<index>
+  cmtIndex <- compartments %>% length() + 1
+  if (name == paste0("A_", cmtIndex)) {
+    name <- NA
+  }
+  return(compartments %>% add(Compartment(index = cmtIndex, name = name)))
 }
 
 #' Detect all compartments names from the code records.

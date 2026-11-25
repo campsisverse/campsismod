@@ -3,26 +3,20 @@
 #_______________________________________________________________________________
 
 #'
-#' ODE class. Any statement in the form d/dt(A_CMT) = B.
+#' ODE class. Any statement in the form d/dt(CMT) = B.
 #'
 #' @export
 setClass(
   "ode",
   representation(),
-  contains = "equation",
-  validity = function(object) {
-    if (startsWith(object@lhs, "A_")) {
-      return(TRUE)
-    } else {
-      return("Derivative name must start with 'A_'")
-    }
-  }
+  contains = "equation"
 )
 
 #'
 #' Create a new ordinary differential equation (ODE).
 #'
-#' @param lhs left-hand side variable corresponding to derivative name, must start with 'A_'
+#' @param lhs left-hand side variable corresponding to the compartment name
+#'   (e.g. 'CENTRAL', or 'A_CENTRAL' in legacy models)
 #' @param rhs right-hand side expression corresponding to derivative value
 #' @param comment comment if any, single character string
 #' @return an ODE
@@ -54,7 +48,7 @@ setMethod("to_string", signature = c("ode"), definition = function(object, ...) 
   } else if (dest == "mrgsolve") {
     retValue <- paste0("dxdt_", object@lhs, "=", object@rhs, ";")
   } else if (dest == "NONMEM") {
-    retValue <- paste0("DADT(", model %>% get_compartment_index(gsub("A_", "", object@lhs)), ")", "=", object@rhs)
+    retValue <- paste0("DADT(", model %>% get_compartment_index(object@lhs), ")", "=", object@rhs)
   } else {
     UnsupportedDestException()
   }

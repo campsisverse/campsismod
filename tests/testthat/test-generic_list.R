@@ -8,7 +8,7 @@ test_that("get_by_index method works well", {
   model <- model_suite$testing$nonmem$advan4_trans4
 
   depot <- model@compartments %>% get_by_index(1)
-  expect_equal(depot@name, "DEPOT")
+  expect_equal(depot@name, "A_DEPOT")
 
   expect_error(model@compartments %>% get_by_index(5), regexp = "Can't find element at index 5")
 })

@@ -101,6 +101,35 @@ nlmixr_ini_omega <- function(model, used) {
   return(lines)
 }
 
+get_statement_expressions <- function(statement) {
+  if (is(statement, "endpoint")) {
+    return(c(statement@variable, statement@lhs, statement@rhs))
+  } else if (is(statement, "equation")) {
+    return(c(statement@lhs, statement@rhs))
+  } else if (is(statement, "if_statement")) {
+    return(c(statement@condition, get_statement_expressions(statement@equation)))
+  } else if (is(statement, "unknown_statement")) {
+    return(statement@line)
+  }
+  return(character(0))
+}
+
+#' Get all variable-like tokens used in the model code and in the
+#' compartment properties.
+#'
+#' @param model Campsis model
+#' @return character vector of unique tokens
+#' @keywords internal
+get_model_tokens <- function(model) {
+  expressions <- model@model@list %>%
+    purrr::map(~ .x@statements@list %>% purrr::map(get_statement_expressions)) %>%
+    unlist()
+  expressions <- c(expressions, model@compartments@properties@list %>% purrr::map_chr(~ .x@rhs))
+  tokens <- regmatches(expressions, gregexpr("[A-Za-z_][A-Za-z0-9_]*", expressions)) %>%
+    unlist()
+  return(unique(tokens))
+}
+
 #' Get the nlmixr2 ini block.
 #'
 #' THETAs are exported as fixed effects (\code{THETA_X <- value}) and OMEGAs as
@@ -196,17 +225,14 @@ check_nlmixr_sigmas <- function(model) {
 
 #' Get the nlmixr2 model block.
 #'
-#' The code is generated with the rxode2 exporter. Compartments are named
-#' without the 'A_' prefix and endpoints are written using the nlmixr2
-#' residual error syntax (\code{add()}, \code{prop()}, \code{combined1()},
-#' \code{combined2()}).
+#' The code is generated with the rxode2 exporter. Compartment names are kept
+#' as is and endpoints are written using the nlmixr2 residual error syntax
+#' (\code{add()}, \code{prop()}, \code{combined1()}, \code{combined2()}).
 #'
 #' @param model Campsis model
 #' @return character vector, one line per statement
 #' @export
 nlmixr_code <- function(model) {
-  cmtNames <- get_unprefixed_compartment_names(model, target = "nlmixr2", allow_unnamed = TRUE)
-  prefixedNames <- model@compartments@list %>% purrr::map_chr(~ .x %>% to_string())
   unusedEps <- check_nlmixr_sigmas(model)
 
   model@model@list <- model@model@list %>%
@@ -221,11 +247,9 @@ nlmixr_code <- function(model) {
       return(record)
     })
 
-  renamed <- cmtNames != prefixedNames
-  code <- rxode_code(model) %>%
-    rename_variables(
-      from = c(prefixedNames[renamed], unusedEps),
-      to = c(cmtNames[renamed], rep("0", length(unusedEps)))
-    )
+  code <- rxode_code(model)
+  for (eps in unusedEps) {
+    code <- code %>% replace_all(pattern = VariablePattern(eps), replacement = "0")
+  }
   return(code)
 }

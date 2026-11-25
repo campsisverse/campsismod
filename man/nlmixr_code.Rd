@@ -13,8 +13,7 @@ nlmixr_code(model)
 character vector, one line per statement
 }
 \description{
-The code is generated with the rxode2 exporter. Compartments are named
-without the 'A_' prefix and endpoints are written using the nlmixr2
-residual error syntax (\code{add()}, \code{prop()}, \code{combined1()},
-\code{combined2()}).
+The code is generated with the rxode2 exporter. Compartment names are kept
+as is and endpoints are written using the nlmixr2 residual error syntax
+(\code{add()}, \code{prop()}, \code{combined1()}, \code{combined2()}).
 }
