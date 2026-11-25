@@ -16,9 +16,11 @@ Parameter class. Any parameter in a pharmacometric model.
 
 \item{\code{value}}{parameter value (e.g. the estimated value from a modelling tool)}
 
-\item{\code{min}}{minimum value for this parameter when parameter uncertainty is enabled}
+\item{\code{min}}{minimum value for this parameter when parameter uncertainty is enabled,
+also exported as lower bound of THETAs to nlmixr2}
 
-\item{\code{max}}{maximum value for this parameter when parameter uncertainty is enabled}
+\item{\code{max}}{maximum value for this parameter when parameter uncertainty is enabled,
+also exported as upper bound of THETAs to nlmixr2}
 
 \item{\code{fix}}{logical value, say if parameter was fixed in the modelling phase}
 

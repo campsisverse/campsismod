@@ -23,9 +23,11 @@ Theta(
 
 \item{value}{parameter value}
 
-\item{min}{minimum value for this parameter when parameter uncertainty is enabled}
+\item{min}{minimum value for this parameter when parameter uncertainty is enabled,
+also exported as lower bound to nlmixr2}
 
-\item{max}{maximum value for this parameter when parameter uncertainty is enabled}
+\item{max}{maximum value for this parameter when parameter uncertainty is enabled,
+also exported as upper bound to nlmixr2}
 
 \item{fix}{parameter was fixed in estimation, logical value}
 

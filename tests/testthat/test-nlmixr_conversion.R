@@ -124,6 +124,40 @@ test_that("OMEGA blocks, fixed parameters and legacy SIGMAs are exported", {
   expect_true("OBS_CP=CP*(0 + 1)" %in% nlmod@model)
 })
 
+test_that("THETA bounds are exported", {
+  model <- endpoints_model() %>%
+    replace(Theta(name = "KA", index = 2, value = 1, min = 0)) %>%
+    replace(Theta(name = "VC", index = 3, value = 10, max = 100)) %>%
+    replace(Theta(name = "CL", index = 4, value = 3, min = 0, max = 10, fix = TRUE)) %>%
+    replace(Theta(name = "PROP_RUV", index = 6, value = 0.1, min = 0, max = 1))
+  nlmod <- model %>% export(dest = "nlmixr2")
+  expect_equal(
+    nlmod@ini[2:6],
+    c(
+      "THETA_KA <- c(0, 1)",
+      "THETA_VC <- c(-Inf, 10, 100)",
+      "THETA_CL <- fix(c(0, 3, 10))",
+      "THETA_ADD_RUV <- 0.05; label(\"Additive residual error (SD)\")",
+      "THETA_PROP_RUV <- c(0, 0.1, 1)"
+    )
+  )
+
+  skip_if_not_installed("rxode2")
+  ui <- suppressMessages(rxode2::rxode2(eval(parse(text = nlmod %>% to_string()))))
+  bounds <- ui$iniDf[!is.na(ui$iniDf$ntheta), c("name", "lower", "est", "upper", "fix")]
+  bounds <- bounds[bounds$name %in% c("THETA_KA", "THETA_VC", "THETA_CL", "THETA_PROP_RUV"), ]
+  expect_equal(bounds$lower, c(0, -Inf, 0, 0))
+  expect_equal(bounds$upper, c(Inf, 100, 10, 1))
+  expect_equal(bounds$fix, c(FALSE, FALSE, TRUE, FALSE))
+})
+
+test_that("Inconsistent THETA bounds give an explicit error", {
+  model <- endpoints_model() %>% replace(Theta(name = "KA", index = 2, value = 1, min = 2))
+  expect_error(model %>% export(dest = "nlmixr2"), regexp = "THETA 'THETA_KA': value \\(1\\) must be within its bounds \\[2, Inf\\]")
+  model <- endpoints_model() %>% replace(Theta(name = "KA", index = 2, value = 1, min = 2, max = 1))
+  expect_error(model %>% export(dest = "nlmixr2"), regexp = "min \\(2\\) must be lower than max \\(1\\)")
+})
+
 test_that("Unused parameters are not exported", {
   model <- endpoints_model() %>%
     add(Theta(name = "UNUSED", index = 7, value = 1)) %>%

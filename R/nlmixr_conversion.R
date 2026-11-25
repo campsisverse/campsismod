@@ -21,6 +21,39 @@ append_nlmixr_label <- function(line, label) {
   return(paste0(line, "; label(", encodeString(label, quote = "\""), ")"))
 }
 
+#' Get the nlmixr2 initial value of a THETA, including its bounds.
+#'
+#' The THETA \code{min} and \code{max} slots are exported as lower and upper
+#' bounds: \code{c(min, value)}, \code{c(min, value, max)} or
+#' \code{c(-Inf, value, max)}.
+#'
+#' @param theta THETA parameter
+#' @param value THETA value
+#' @return single character string, e.g. \code{c(0, 0.2, 1)}
+#' @keywords internal
+format_nlmixr_theta <- function(theta, value) {
+  if (is.na(theta@min) && is.na(theta@max)) {
+    return(format_nlmixr_value(value, fix = theta@fix))
+  }
+  lower <- if (is.na(theta@min)) -Inf else theta@min
+  upper <- if (is.na(theta@max)) Inf else theta@max
+  name <- theta %>% get_name_in_model()
+  if (lower >= upper) {
+    stop(sprintf("THETA '%s': min (%s) must be lower than max (%s)", name, format(lower), format(upper)))
+  }
+  if (value < lower || value > upper) {
+    stop(sprintf(
+      "THETA '%s': value (%s) must be within its bounds [%s, %s]",
+      name,
+      format(value),
+      format(lower),
+      format(upper)
+    ))
+  }
+  values <- if (is.na(theta@max)) c(lower, value) else c(lower, value, upper)
+  return(format_nlmixr_value(values, fix = theta@fix))
+}
+
 #' Get the THETA lines of the nlmixr2 ini block.
 #'
 #' @param model Campsis model
@@ -37,7 +70,7 @@ nlmixr_ini_theta <- function(model, used) {
   lines <- character(0)
   for (i in which(thetaNames %in% used)) {
     theta <- model@parameters %>% get_by_index(Theta(index = i))
-    line <- paste0(thetaNames[i], " <- ", format_nlmixr_value(values[[i]], fix = theta@fix))
+    line <- paste0(thetaNames[i], " <- ", format_nlmixr_theta(theta, value = values[[i]]))
     lines <- c(lines, append_nlmixr_label(line, theta@label))
   }
   return(lines)
@@ -132,8 +165,10 @@ get_model_tokens <- function(model) {
 
 #' Get the nlmixr2 ini block.
 #'
-#' THETAs are exported as fixed effects (\code{THETA_X <- value}) and OMEGAs as
-#' between-subject variabilities (\code{ETA_X ~ variance}). SIGMAs are not
+#' THETAs are exported as fixed effects (\code{THETA_X <- value}), with their
+#' \code{min} and \code{max} as estimation bounds (\code{THETA_X <- c(min, value, max)}),
+#' and OMEGAs as between-subject variabilities (\code{ETA_X ~ variance}). OMEGA
+#' bounds are not exported. SIGMAs are not
 #' exported: residual variability is described by the endpoints in the model
 #' block, their THETAs holding the standard deviations. Parameters that are not
 #' used in the model code are dropped with a warning, since nlmixr2 rejects

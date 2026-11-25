@@ -8,8 +8,10 @@
 #' @slot name parameter name, optional (although recommended)
 #' @slot index parameter index, integer
 #' @slot value parameter value (e.g. the estimated value from a modelling tool)
-#' @slot min minimum value for this parameter when parameter uncertainty is enabled
-#' @slot max maximum value for this parameter when parameter uncertainty is enabled
+#' @slot min minimum value for this parameter when parameter uncertainty is enabled,
+#'   also exported as lower bound of THETAs to nlmixr2
+#' @slot max maximum value for this parameter when parameter uncertainty is enabled,
+#'   also exported as upper bound of THETAs to nlmixr2
 #' @slot fix logical value, say if parameter was fixed in the modelling phase
 #' @slot label parameter label, any string
 #' @slot comment any comment on this parameter, any string
@@ -126,8 +128,10 @@ setClass(
 #' @param name parameter name, e.g. CL (prefix THETA will be added automatically)
 #' @param index parameter index
 #' @param value parameter value
-#' @param min minimum value for this parameter when parameter uncertainty is enabled
-#' @param max maximum value for this parameter when parameter uncertainty is enabled
+#' @param min minimum value for this parameter when parameter uncertainty is enabled,
+#'   also exported as lower bound to nlmixr2
+#' @param max maximum value for this parameter when parameter uncertainty is enabled,
+#'   also exported as upper bound to nlmixr2
 #' @param fix parameter was fixed in estimation, logical value
 #' @param label parameter label, optional
 #' @param unit parameter unit, optional

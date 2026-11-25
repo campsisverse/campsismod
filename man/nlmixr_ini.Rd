@@ -13,8 +13,10 @@ nlmixr_ini(model)
 character vector, one line per parameter
 }
 \description{
-THETAs are exported as fixed effects (\code{THETA_X <- value}) and OMEGAs as
-between-subject variabilities (\code{ETA_X ~ variance}). SIGMAs are not
+THETAs are exported as fixed effects (\code{THETA_X <- value}), with their
+\code{min} and \code{max} as estimation bounds (\code{THETA_X <- c(min, value, max)}),
+and OMEGAs as between-subject variabilities (\code{ETA_X ~ variance}). OMEGA
+bounds are not exported. SIGMAs are not
 exported: residual variability is described by the endpoints in the model
 block, their THETAs holding the standard deviations. Parameters that are not
 used in the model code are dropped with a warning, since nlmixr2 rejects
